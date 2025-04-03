@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Formatter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        .editor-pane {
+            flex: 1;
+        }
+        textarea {
+            width: 100%;
+            height: 400px;
+            padding: 10px;
+            font-family: monospace;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        h2 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h2>SQL Formatter</h2>
+    <div class="container">
+        <div class="editor-pane">
+            <textarea id="inputSql" placeholder="Enter your SQL here..."></textarea>
+            <button onclick="formatSql()">Format SQL</button>
+            <button onclick="copyToClipboard()">Copy to Clipboard</button>
+        </div>
+        <div class="editor-pane">
+            <textarea id="outputSql" readonly placeholder="Formatted SQL will appear here..."></textarea>
+        </div>
+    </div>
+
+    <script>
+        function formatSql() {
+            const input = document.getElementById('inputSql').value;
+            const formatted = formatSQL(input);
+            document.getElementById('outputSql').value = formatted;
+        }
+
+        function copyToClipboard() {
+            const output = document.getElementById('outputSql');
+            output.select();
+            navigator.clipboard.writeText(output.value);
+        }
+
+        function formatSQL(sql) {
+            const formatted = [];
+            let indentLevel = 0;
+            const keywords = ['WITH', 'SELECT', 'FROM', 'WHERE', 'GROUP BY', 'HAVING', 
+                            'ORDER BY', 'LIMIT', 'JOIN', 'LEFT JOIN', 'RIGHT JOIN', 
+                            'INNER JOIN', 'FULL JOIN', 'CROSS JOIN'];
+            const cteRegex = /(WITH\s+[\w\s]+?AS\s*\([^)]+\))(.*)/gis;
+            const cteMatch = cteRegex.exec(sql);
+
+            if (cteMatch) {
+                const ctes = cteMatch[1].split(/(?=,\s*\w+\s+AS\s*\()/gi);
+                formatted.push(formatCTE(ctes[0].trim(), indentLevel));
+
+                for (let i = 1; i < ctes.length; i++) {
+                    formatted.push(`,\n${formatCTE(ctes[i].replace(/^,\s*/, '').trim(), indentLevel)}`);
+                }
+
+                indentLevel++;
+                formatted.push('\n' + formatMainQuery(cteMatch[2].trim(), indentLevel));
+            } else {
+                formatted.push(formatMainQuery(sql, indentLevel));
+            }
+
+            return formatted.join('').replace(/\n+/g, '\n');
+        }
+
+        function formatCTE(cte, indentLevel) {
+            const parts = cte.split(/AS\s*\(/i);
+            const cteName = parts[0].trim();
+            const cteBody = parts[1].replace(/\)\s*$/, '');
+            
+            return `${cteName} AS (\n${formatMainQuery(cteBody, indentLevel + 1)}\n${'  '.repeat(indentLevel)})`;
+        }
+
+        function formatMainQuery(query, indentLevel) {
+            const clauses = query
+                .replace(/(\b(?:ON|USING|AND|OR)\b)/gi, '\n$1')
+                .split(/(?=\b(?:SELECT|FROM|WHERE|GROUP BY|HAVING|ORDER BY|LIMIT|JOIN)\b)/gi);
+
+            return clauses.map(clause => {
+                const trimmed = clause.trim();
+                const keyword = trimmed.split(/\s+/)[0].toUpperCase();
+                const indent = keyword === 'FROM' ? indentLevel - 1 : indentLevel;
+
+                return `\n${'  '.repeat(indent)}${trimmed}`;
+            }).join('').trim();
+        }
+    </script>
+</body>
+</html>
