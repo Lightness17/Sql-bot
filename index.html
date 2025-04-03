@@ -66,6 +66,22 @@
     <button onclick="formatSQL()">Format SQL</button>
 
     <script>
+        function capitalizeKeywords(sqlQuery) {
+            const keywords = [
+                'SELECT', 'FROM', 'WHERE', 'JOIN', 'INNER', 'LEFT', 'RIGHT', 
+                'ON', 'GROUP BY', 'ORDER BY', 'HAVING', 'AND', 'OR', 'NOT', 
+                'IN', 'BETWEEN', 'LIKE', 'IS', 'NULL', 'DISTINCT', 'LIMIT', 
+                'OFFSET', 'WHEN'
+            ];
+
+            let result = sqlQuery;
+            for (const keyword of keywords) {
+                const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
+                result = result.replace(regex, keyword);
+            }
+            return result;
+        }
+
         function addIndentation(sqlQuery) {
             const indentLevels = {
                 'SELECT': 4,
@@ -95,7 +111,7 @@
                 const strippedLine = line.trim();
                 if (strippedLine) {
                     const keyword = Object.keys(indentLevels).find(kw => 
-                        strippedLine.toUpperCase().startsWith(kw.toUpperCase())
+                        strippedLine.startsWith(kw.toUpperCase())
                     );
                     currentIndentLevel = keyword ? indentLevels[keyword] : 11;
                     indentedQuery += ' '.repeat(currentIndentLevel) + strippedLine + '\n';
@@ -108,9 +124,11 @@
 
         function formatSQL() {
             const input = document.getElementById('input-sql').value;
-            const formatted = addIndentation(input);
+            const capitalized = capitalizeKeywords(input);
+            const formatted = addIndentation(capitalized);
             document.getElementById('output-sql').value = formatted;
         }
     </script>
+
 </body>
 </html>
