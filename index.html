@@ -65,70 +65,78 @@
     </div>
     <button onclick="formatSQL()">Format SQL</button>
 
-    <script>
-        function capitalizeKeywords(sqlQuery) {
-            const keywords = [
-                'SELECT', 'FROM', 'WHERE', 'JOIN', 'INNER', 'LEFT', 'RIGHT', 
-                'ON', 'GROUP BY', 'ORDER BY', 'HAVING', 'AND', 'OR', 'NOT', 
-                'IN', 'BETWEEN', 'LIKE', 'IS', 'NULL', 'DISTINCT', 'LIMIT', 
-                'OFFSET', 'WHEN'
-            ];
+<script>
+    // Existing functions remain unchanged
+    function removeEmptyLines(sqlQuery) {
+        return sqlQuery
+            .split('\n')
+            .filter(line => line.trim() !== '')
+            .join('\n');
+    }
 
-            let result = sqlQuery;
-            for (const keyword of keywords) {
-                const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
-                result = result.replace(regex, keyword);
+    function capitalizeKeywords(sqlQuery) {
+        const keywords = [
+            'SELECT', 'FROM', 'WHERE', 'JOIN', 'INNER', 'LEFT', 'RIGHT', 
+            'ON', 'GROUP BY', 'ORDER BY', 'HAVING', 'AND', 'OR', 'NOT', 
+            'IN', 'BETWEEN', 'LIKE', 'IS', 'NULL', 'DISTINCT', 'LIMIT', 
+            'OFFSET', 'WHEN'
+        ];
+        
+        let result = sqlQuery;
+        for (const keyword of keywords) {
+            const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
+            result = result.replace(regex, keyword);
+        }
+        return result;
+    }
+
+    function addIndentation(sqlQuery) {
+        const indentLevels = {
+            'SELECT': 4,
+            'FROM': 6,
+            'WHERE': 5,
+            'GROUP BY': 5,
+            'ORDER BY': 5,
+            'INNER JOIN': 5,
+            'LEFT JOIN': 6,
+            'RIGHT JOIN': 5,
+            'ON': 8,
+            'AND': 7,
+            'OR': 7,
+            'HAVING': 4,
+            'LIMIT': 5,
+            'OFFSET': 5,
+            'WHEN': 16,
+            'ELSE': 16,
+            'THEN': 16
+        };
+
+        const lines = sqlQuery.split('\n');
+        let indentedQuery = '';
+        let currentIndentLevel = 0;
+
+        for (const line of lines) {
+            const strippedLine = line.trim();
+            if (strippedLine) {
+                const keyword = Object.keys(indentLevels).find(kw => 
+                    strippedLine.startsWith(kw.toUpperCase())
+                );
+                currentIndentLevel = keyword ? indentLevels[keyword] : 11;
+                indentedQuery += ' '.repeat(currentIndentLevel) + strippedLine + '\n';
             }
-            return result;
         }
+        return indentedQuery;
+    }
 
-        function addIndentation(sqlQuery) {
-            const indentLevels = {
-                'SELECT': 4,
-                'FROM': 6,
-                'WHERE': 5,
-                'GROUP BY': 5,
-                'ORDER BY': 5,
-                'INNER JOIN': 5,
-                'LEFT JOIN': 6,
-                'RIGHT JOIN': 5,
-                'ON': 8,
-                'AND': 7,
-                'OR': 7,
-                'HAVING': 4,
-                'LIMIT': 5,
-                'OFFSET': 5,
-                'WHEN': 16,
-                'ELSE': 16,
-                'THEN': 16
-            };
-
-            const lines = sqlQuery.split('\n');
-            let indentedQuery = '';
-            let currentIndentLevel = 0;
-
-            for (const line of lines) {
-                const strippedLine = line.trim();
-                if (strippedLine) {
-                    const keyword = Object.keys(indentLevels).find(kw => 
-                        strippedLine.startsWith(kw.toUpperCase())
-                    );
-                    currentIndentLevel = keyword ? indentLevels[keyword] : 11;
-                    indentedQuery += ' '.repeat(currentIndentLevel) + strippedLine + '\n';
-                } else {
-                    indentedQuery += '\n';
-                }
-            }
-            return indentedQuery;
-        }
-
-        function formatSQL() {
-            const input = document.getElementById('input-sql').value;
-            const capitalized = capitalizeKeywords(input);
-            const formatted = addIndentation(capitalized);
-            document.getElementById('output-sql').value = formatted;
-        }
-    </script>
+    // Updated format function with processing pipeline
+    function formatSQL() {
+        const input = document.getElementById('input-sql').value;
+        const cleaned = removeEmptyLines(input);
+        const capitalized = capitalizeKeywords(cleaned);
+        const formatted = addIndentation(capitalized);
+        document.getElementById('output-sql').value = formatted;
+    }
+</script>
 
 </body>
 </html>
