@@ -3,28 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Tax Calculator</title>
+    <title>Philippines Income Tax Calculator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .gradient-bg {
-            background: linear-gradient(135deg, #6b73ff 0%, #000dff 100%);
+            background: linear-gradient(135deg, #0055b8 0%, #003366 100%);
         }
         .result-card {
-            box-shadow: 0 10px 30px -10px rgba(0, 13, 255, 0.3);
+            box-shadow: 0 10px 30px -10px rgba(0, 85, 184, 0.3);
             transition: all 0.3s ease;
         }
         .result-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 35px -10px rgba(0, 13, 255, 0.4);
+            box-shadow: 0 15px 35px -10px rgba(0, 85, 184, 0.4);
         }
         .input-highlight {
             transition: all 0.3s ease;
-            border-color: #6b73ff;
+            border-color: #0055b8;
         }
         .input-highlight:focus {
-            border-color: #000dff;
-            box-shadow: 0 0 0 3px rgba(107, 115, 255, 0.2);
+            border-color: #003366;
+            box-shadow: 0 0 0 3px rgba(0, 85, 184, 0.2);
         }
         .toggle-switch {
             position: relative;
@@ -60,10 +60,13 @@
             border-radius: 50%;
         }
         input:checked + .slider {
-            background-color: #000dff;
+            background-color: #0055b8;
         }
         input:checked + .slider:before {
             transform: translateX(26px);
+        }
+        .tax-bracket {
+            border-left: 4px solid #0055b8;
         }
     </style>
 </head>
@@ -72,8 +75,8 @@
         <div class="max-w-4xl mx-auto">
             <!-- Header -->
             <div class="text-center mb-12">
-                <h1 class="text-4xl font-bold text-gray-800 mb-2">Smart Tax Calculator</h1>
-                <p class="text-gray-600">Calculate your taxes accurately with our easy-to-use calculator</p>
+                <h1 class="text-4xl font-bold text-gray-800 mb-2">Philippines Income Tax Calculator</h1>
+                <p class="text-gray-600">Calculate your taxes based on BIR's graduated income tax rates</p>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -86,72 +89,132 @@
                         <!-- Income Section -->
                         <div class="mb-8">
                             <div class="flex items-center mb-4">
-                                <i class="fas fa-money-bill-wave text-blue-500 mr-3 text-lg"></i>
+                                <i class="fas fa-money-bill-wave text-blue-700 mr-3 text-lg"></i>
                                 <h3 class="text-lg font-medium text-gray-700">Income Information</h3>
                             </div>
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label for="grossIncome" class="block text-sm font-medium text-gray-700 mb-1">Gross Annual Income</label>
+                                    <label for="basicSalary" class="block text-sm font-medium text-gray-700 mb-1">Basic Salary (PHP)</label>
                                     <div class="relative">
-                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">$</span>
-                                        <input type="number" id="grossIncome" class="pl-8 w-full rounded-md border-gray-300 shadow-sm input-highlight focus:ring-blue-500 focus:border-blue-500 py-2" placeholder="0.00" required>
+                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">₱</span>
+                                        <input type="number" id="basicSalary" class="pl-8 w-full rounded-md border-gray-300 shadow-sm input-highlight focus:ring-blue-700 focus:border-blue-700 py-2" placeholder="0.00" required>
                                     </div>
                                 </div>
                                 
                                 <div>
-                                    <label for="extraIncome" class="block text-sm font-medium text-gray-700 mb-1">Extra Income</label>
+                                    <label for="overtimePay" class="block text-sm font-medium text-gray-700 mb-1">Overtime Pay (PHP)</label>
                                     <div class="relative">
-                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">$</span>
-                                        <input type="number" id="extraIncome" class="pl-8 w-full rounded-md border-gray-300 shadow-sm input-highlight focus:ring-blue-500 focus:border-blue-500 py-2" placeholder="0.00">
+                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">₱</span>
+                                        <input type="number" id="overtimePay" class="pl-8 w-full rounded-md border-gray-300 shadow-sm input-highlight focus:ring-blue-700 focus:border-blue-700 py-2" placeholder="0.00">
                                     </div>
                                 </div>
                                 
                                 <div>
-                                    <label for="deductions" class="block text-sm font-medium text-gray-700 mb-1">Total Deductions</label>
+                                    <label for="bonuses" class="block text-sm font-medium text-gray-700 mb-1">Bonuses/13th Month (PHP)</label>
                                     <div class="relative">
-                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">$</span>
-                                        <input type="number" id="deductions" class="pl-8 w-full rounded-md border-gray-300 shadow-sm input-highlight focus:ring-blue-500 focus:border-blue-500 py-2" placeholder="0.00">
+                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">₱</span>
+                                        <input type="number" id="bonuses" class="pl-8 w-full rounded-md border-gray-300 shadow-sm input-highlight focus:ring-blue-700 focus:border-blue-700 py-2" placeholder="0.00">
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label for="otherIncome" class="block text-sm font-medium text-gray-700 mb-1">Other Income (PHP)</label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">₱</span>
+                                        <input type="number" id="otherIncome" class="pl-8 w-full rounded-md border-gray-300 shadow-sm input-highlight focus:ring-blue-700 focus:border-blue-700 py-2" placeholder="0.00">
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Age Group Selection -->
+                        <!-- Deductions Section -->
                         <div class="mb-8">
                             <div class="flex items-center mb-4">
-                                <i class="fas fa-user-clock text-blue-500 mr-3 text-lg"></i>
-                                <h3 class="text-lg font-medium text-gray-700">Age Group</h3>
+                                <i class="fas fa-receipt text-blue-700 mr-3 text-lg"></i>
+                                <h3 class="text-lg font-medium text-gray-700">Deductions</h3>
                             </div>
                             
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <input type="radio" id="ageUnder40" name="ageGroup" value="under40" class="hidden peer" checked>
-                                    <label for="ageUnder40" class="inline-flex items-center justify-between w-full p-4 text-gray-700 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:bg-gray-50">
+                                    <label for="sss" class="block text-sm font-medium text-gray-700 mb-1">SSS Contributions (PHP)</label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">₱</span>
+                                        <input type="number" id="sss" class="pl-8 w-full rounded-md border-gray-300 shadow-sm input-highlight focus:ring-blue-700 focus:border-blue-700 py-2" placeholder="0.00">
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label for="philhealth" class="block text-sm font-medium text-gray-700 mb-1">PhilHealth (PHP)</label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">₱</span>
+                                        <input type="number" id="philhealth" class="pl-8 w-full rounded-md border-gray-300 shadow-sm input-highlight focus:ring-blue-700 focus:border-blue-700 py-2" placeholder="0.00">
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label for="pagibig" class="block text-sm font-medium text-gray-700 mb-1">Pag-IBIG (PHP)</label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">₱</span>
+                                        <input type="number" id="pagibig" class="pl-8 w-full rounded-md border-gray-300 shadow-sm input-highlight focus:ring-blue-700 focus:border-blue-700 py-2" placeholder="0.00">
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label for="otherDeductions" class="block text-sm font-medium text-gray-700 mb-1">Other Deductions (PHP)</label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">₱</span>
+                                        <input type="number" id="otherDeductions" class="pl-8 w-full rounded-md border-gray-300 shadow-sm input-highlight focus:ring-blue-700 focus:border-blue-700 py-2" placeholder="0.00">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Filing Status -->
+                        <div class="mb-8">
+                            <div class="flex items-center mb-4">
+                                <i class="fas fa-user-tag text-blue-700 mr-3 text-lg"></i>
+                                <h3 class="text-lg font-medium text-gray-700">Filing Status</h3>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <input type="radio" id="statusSingle" name="filingStatus" value="single" class="hidden peer" checked>
+                                    <label for="statusSingle" class="inline-flex items-center justify-between w-full p-4 text-gray-700 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-700 peer-checked:bg-blue-50 hover:bg-gray-50">
                                         <div class="block">
-                                            <div class="font-medium">Under 40</div>
+                                            <div class="font-medium">Single</div>
                                         </div>
-                                        <i class="fas fa-check-circle text-blue-500 hidden peer-checked:block"></i>
+                                        <i class="fas fa-check-circle text-blue-700 hidden peer-checked:block"></i>
                                     </label>
                                 </div>
                                 
                                 <div>
-                                    <input type="radio" id="age40to60" name="ageGroup" value="40to60" class="hidden peer">
-                                    <label for="age40to60" class="inline-flex items-center justify-between w-full p-4 text-gray-700 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:bg-gray-50">
+                                    <input type="radio" id="statusMarried" name="filingStatus" value="married" class="hidden peer">
+                                    <label for="statusMarried" class="inline-flex items-center justify-between w-full p-4 text-gray-700 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-700 peer-checked:bg-blue-50 hover:bg-gray-50">
                                         <div class="block">
-                                            <div class="font-medium">40 to 60</div>
+                                            <div class="font-medium">Married</div>
                                         </div>
-                                        <i class="fas fa-check-circle text-blue-500 hidden peer-checked:block"></i>
+                                        <i class="fas fa-check-circle text-blue-700 hidden peer-checked:block"></i>
                                     </label>
                                 </div>
                                 
                                 <div>
-                                    <input type="radio" id="ageOver60" name="ageGroup" value="over60" class="hidden peer">
-                                    <label for="ageOver60" class="inline-flex items-center justify-between w-full p-4 text-gray-700 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:bg-gray-50">
+                                    <input type="radio" id="statusHead" name="filingStatus" value="head" class="hidden peer">
+                                    <label for="statusHead" class="inline-flex items-center justify-between w-full p-4 text-gray-700 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-700 peer-checked:bg-blue-50 hover:bg-gray-50">
                                         <div class="block">
-                                            <div class="font-medium">Over 60</div>
+                                            <div class="font-medium">Head of Family</div>
                                         </div>
-                                        <i class="fas fa-check-circle text-blue-500 hidden peer-checked:block"></i>
+                                        <i class="fas fa-check-circle text-blue-700 hidden peer-checked:block"></i>
+                                    </label>
+                                </div>
+                                
+                                <div>
+                                    <input type="radio" id="statusSenior" name="filingStatus" value="senior" class="hidden peer">
+                                    <label for="statusSenior" class="inline-flex items-center justify-between w-full p-4 text-gray-700 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-700 peer-checked:bg-blue-50 hover:bg-gray-50">
+                                        <div class="block">
+                                            <div class="font-medium">Senior Citizen</div>
+                                        </div>
+                                        <i class="fas fa-check-circle text-blue-700 hidden peer-checked:block"></i>
                                     </label>
                                 </div>
                             </div>
@@ -160,49 +223,15 @@
                         <!-- Tax Year Selection -->
                         <div class="mb-8">
                             <div class="flex items-center mb-4">
-                                <i class="fas fa-calendar-alt text-blue-500 mr-3 text-lg"></i>
+                                <i class="fas fa-calendar-alt text-blue-700 mr-3 text-lg"></i>
                                 <h3 class="text-lg font-medium text-gray-700">Tax Year</h3>
                             </div>
                             
-                            <select id="taxYear" class="w-full rounded-md border-gray-300 shadow-sm input-highlight focus:ring-blue-500 focus:border-blue-500 py-2">
-                                <option value="2023">2023-2024</option>
-                                <option value="2022">2022-2023</option>
-                                <option value="2021">2021-2022</option>
+                            <select id="taxYear" class="w-full rounded-md border-gray-300 shadow-sm input-highlight focus:ring-blue-700 focus:border-blue-700 py-2">
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                                <option value="2022">2022</option>
                             </select>
-                        </div>
-                        
-                        <!-- Advanced Options Toggle -->
-                        <div class="mb-6">
-                            <label class="flex items-center cursor-pointer">
-                                <div class="toggle-switch mr-3">
-                                    <input type="checkbox" id="advancedToggle">
-                                    <span class="slider"></span>
-                                </div>
-                                <span class="text-sm font-medium text-gray-700">Show Advanced Options</span>
-                            </label>
-                        </div>
-                        
-                        <!-- Advanced Options (Hidden by default) -->
-                        <div id="advancedOptions" class="hidden mb-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                            <div class="flex items-center mb-4">
-                                <i class="fas fa-cog text-blue-500 mr-3 text-lg"></i>
-                                <h3 class="text-lg font-medium text-gray-700">Advanced Options</h3>
-                            </div>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label for="stateTax" class="block text-sm font-medium text-gray-700 mb-1">State Tax Rate (%)</label>
-                                    <input type="number" id="stateTax" class="w-full rounded-md border-gray-300 shadow-sm input-highlight focus:ring-blue-500 focus:border-blue-500 py-2" placeholder="0.00" min="0" max="15" step="0.1">
-                                </div>
-                                
-                                <div>
-                                    <label for="investmentDeductions" class="block text-sm font-medium text-gray-700 mb-1">Investment Deductions</label>
-                                    <div class="relative">
-                                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">$</span>
-                                        <input type="number" id="investmentDeductions" class="pl-8 w-full rounded-md border-gray-300 shadow-sm input-highlight focus:ring-blue-500 focus:border-blue-500 py-2" placeholder="0.00">
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                         
                         <!-- Submit Button -->
@@ -232,7 +261,7 @@
                                     <div class="space-y-3">
                                         <div class="flex justify-between">
                                             <span class="text-gray-600">Taxable Income:</span>
-                                            <span id="taxableIncome" class="font-medium">$0.00</span>
+                                            <span id="taxableIncome" class="font-medium">₱0.00</span>
                                         </div>
                                         <div class="flex justify-between">
                                             <span class="text-gray-600">Tax Rate:</span>
@@ -240,35 +269,39 @@
                                         </div>
                                         <div class="flex justify-between border-t border-gray-200 pt-3">
                                             <span class="text-gray-600">Tax Amount:</span>
-                                            <span id="taxAmount" class="font-medium text-blue-600">$0.00</span>
+                                            <span id="taxAmount" class="font-medium text-blue-700">₱0.00</span>
                                         </div>
                                         <div class="flex justify-between">
                                             <span class="text-gray-600">After Tax Income:</span>
-                                            <span id="afterTaxIncome" class="font-medium text-green-600">$0.00</span>
+                                            <span id="afterTaxIncome" class="font-medium text-green-600">₱0.00</span>
                                         </div>
                                     </div>
                                 </div>
                                 
                                 <div class="mb-6">
-                                    <h3 class="text-lg font-medium text-gray-700 mb-4">Breakdown</h3>
+                                    <h3 class="text-lg font-medium text-gray-700 mb-4">Deductions</h3>
                                     <div class="bg-blue-50 rounded-lg p-4">
                                         <div class="flex justify-between mb-2">
-                                            <span class="text-sm text-gray-600">Federal Tax:</span>
-                                            <span id="federalTax" class="text-sm font-medium">$0.00</span>
+                                            <span class="text-sm text-gray-600">SSS:</span>
+                                            <span id="sssResult" class="text-sm font-medium">₱0.00</span>
                                         </div>
                                         <div class="flex justify-between mb-2">
-                                            <span class="text-sm text-gray-600">State Tax:</span>
-                                            <span id="stateTaxResult" class="text-sm font-medium">$0.00</span>
+                                            <span class="text-sm text-gray-600">PhilHealth:</span>
+                                            <span id="philhealthResult" class="text-sm font-medium">₱0.00</span>
+                                        </div>
+                                        <div class="flex justify-between mb-2">
+                                            <span class="text-sm text-gray-600">Pag-IBIG:</span>
+                                            <span id="pagibigResult" class="text-sm font-medium">₱0.00</span>
                                         </div>
                                         <div class="flex justify-between">
-                                            <span class="text-sm text-gray-600">Other Taxes:</span>
-                                            <span id="otherTaxes" class="text-sm font-medium">$0.00</span>
+                                            <span class="text-sm text-gray-600">Other Deductions:</span>
+                                            <span id="otherDeductionsResult" class="text-sm font-medium">₱0.00</span>
                                         </div>
                                     </div>
                                 </div>
                                 
                                 <div class="text-center">
-                                    <button id="saveResults" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                    <button id="saveResults" class="text-blue-700 hover:text-blue-900 text-sm font-medium">
                                         <i class="fas fa-save mr-2"></i> Save Results
                                     </button>
                                 </div>
@@ -278,40 +311,64 @@
                 </div>
             </div>
             
-            <!-- Info Section -->
+            <!-- Tax Brackets Info -->
             <div class="mt-12 bg-white rounded-xl shadow-md overflow-hidden">
                 <div class="gradient-bg py-4 px-6">
-                    <h2 class="text-xl font-semibold text-white">Tax Information</h2>
+                    <h2 class="text-xl font-semibold text-white">Philippines Tax Brackets (2024)</h2>
                 </div>
                 <div class="p-6">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="flex items-start">
-                            <div class="bg-blue-100 p-3 rounded-full mr-4">
-                                <i class="fas fa-info-circle text-blue-600"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-medium text-gray-800 mb-1">Tax Slabs</h3>
-                                <p class="text-sm text-gray-600">Under 40: 30%, 40-60: 20%, Over 60: 10% on income over $8L</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start">
-                            <div class="bg-blue-100 p-3 rounded-full mr-4">
-                                <i class="fas fa-percentage text-blue-600"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-medium text-gray-800 mb-1">Standard Deduction</h3>
-                                <p class="text-sm text-gray-600">$50,000 standard deduction applied automatically</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start">
-                            <div class="bg-blue-100 p-3 rounded-full mr-4">
-                                <i class="fas fa-hand-holding-usd text-blue-600"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-medium text-gray-800 mb-1">Rebates</h3>
-                                <p class="text-sm text-gray-600">Up to $12,500 in tax rebates may apply</p>
-                            </div>
-                        </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Annual Income Range</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tax Rate</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Base Tax</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Additional Tax</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr class="tax-bracket">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Up to ₱250,000</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">0%</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₱0</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">None</td>
+                                </tr>
+                                <tr class="tax-bracket">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₱250,001 - ₱400,000</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">15%</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₱0</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">15% of excess over ₱250,000</td>
+                                </tr>
+                                <tr class="tax-bracket">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₱400,001 - ₱800,000</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">20%</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₱22,500</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">20% of excess over ₱400,000</td>
+                                </tr>
+                                <tr class="tax-bracket">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₱800,001 - ₱2,000,000</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">25%</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₱102,500</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">25% of excess over ₱800,000</td>
+                                </tr>
+                                <tr class="tax-bracket">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₱2,000,001 - ₱8,000,000</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">30%</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₱402,500</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">30% of excess over ₱2,000,000</td>
+                                </tr>
+                                <tr class="tax-bracket">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Over ₱8,000,000</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">35%</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₱2,202,500</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">35% of excess over ₱8,000,000</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-4 text-sm text-gray-500">
+                        <p>* Senior citizens and persons with disability (PWD) may be eligible for additional exemptions.</p>
                     </div>
                 </div>
             </div>
@@ -320,18 +377,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Toggle advanced options
-            const advancedToggle = document.getElementById('advancedToggle');
-            const advancedOptions = document.getElementById('advancedOptions');
-            
-            advancedToggle.addEventListener('change', function() {
-                if(this.checked) {
-                    advancedOptions.classList.remove('hidden');
-                } else {
-                    advancedOptions.classList.add('hidden');
-                }
-            });
-            
             // Form submission
             const taxForm = document.getElementById('taxForm');
             const resultsPlaceholder = document.getElementById('resultsPlaceholder');
@@ -341,57 +386,68 @@
                 e.preventDefault();
                 
                 // Get form values
-                const grossIncome = parseFloat(document.getElementById('grossIncome').value) || 0;
-                const extraIncome = parseFloat(document.getElementById('extraIncome').value) || 0;
-                const deductions = parseFloat(document.getElementById('deductions').value) || 0;
-                const ageGroup = document.querySelector('input[name="ageGroup"]:checked').value;
+                const basicSalary = parseFloat(document.getElementById('basicSalary').value) || 0;
+                const overtimePay = parseFloat(document.getElementById('overtimePay').value) || 0;
+                const bonuses = parseFloat(document.getElementById('bonuses').value) || 0;
+                const otherIncome = parseFloat(document.getElementById('otherIncome').value) || 0;
+                const sss = parseFloat(document.getElementById('sss').value) || 0;
+                const philhealth = parseFloat(document.getElementById('philhealth').value) || 0;
+                const pagibig = parseFloat(document.getElementById('pagibig').value) || 0;
+                const otherDeductions = parseFloat(document.getElementById('otherDeductions').value) || 0;
+                const filingStatus = document.querySelector('input[name="filingStatus"]:checked').value;
                 const taxYear = document.getElementById('taxYear').value;
-                const stateTaxRate = parseFloat(document.getElementById('stateTax').value) || 0;
-                const investmentDeductions = parseFloat(document.getElementById('investmentDeductions').value) || 0;
                 
-                // Calculate taxable income
-                const standardDeduction = 50000;
-                const totalDeductions = deductions + standardDeduction + investmentDeductions;
-                const totalIncome = grossIncome + extraIncome;
+                // Calculate total income and deductions
+                const totalIncome = basicSalary + overtimePay + bonuses + otherIncome;
+                const totalDeductions = sss + philhealth + pagibig + otherDeductions;
+                
+                // Calculate taxable income (after deductions)
                 let taxableIncome = totalIncome - totalDeductions;
                 taxableIncome = taxableIncome > 0 ? taxableIncome : 0;
                 
-                // Determine tax rate based on age group
-                let taxRate = 0;
-                const taxThreshold = 800000; // 8L threshold
+                // Calculate tax based on Philippines graduated tax rates
+                let taxAmount = 0;
+                let taxRate = "0%";
                 
-                if(taxableIncome > taxThreshold) {
-                    switch(ageGroup) {
-                        case 'under40':
-                            taxRate = 0.3;
-                            break;
-                        case '40to60':
-                            taxRate = 0.2;
-                            break;
-                        case 'over60':
-                            taxRate = 0.1;
-                            break;
-                    }
+                if (taxableIncome <= 250000) {
+                    taxAmount = 0;
+                    taxRate = "0%";
+                } else if (taxableIncome <= 400000) {
+                    taxAmount = (taxableIncome - 250000) * 0.15;
+                    taxRate = "15%";
+                } else if (taxableIncome <= 800000) {
+                    taxAmount = 22500 + (taxableIncome - 400000) * 0.20;
+                    taxRate = "20%";
+                } else if (taxableIncome <= 2000000) {
+                    taxAmount = 102500 + (taxableIncome - 800000) * 0.25;
+                    taxRate = "25%";
+                } else if (taxableIncome <= 8000000) {
+                    taxAmount = 402500 + (taxableIncome - 2000000) * 0.30;
+                    taxRate = "30%";
+                } else {
+                    taxAmount = 2202500 + (taxableIncome - 8000000) * 0.35;
+                    taxRate = "35%";
                 }
                 
-                // Calculate taxes
-                const taxAmount = taxableIncome > taxThreshold ? (taxableIncome - taxThreshold) * taxRate : 0;
-                const stateTaxAmount = taxableIncome * (stateTaxRate / 100);
-                const otherTaxes = 0; // Could add other tax calculations here
-                const totalTax = taxAmount + stateTaxAmount + otherTaxes;
-                const afterTaxIncome = totalIncome - totalTax;
+                // Apply additional exemptions for senior citizens
+                if (filingStatus === "senior") {
+                    taxAmount = taxAmount * 0.8; // 20% discount for seniors
+                }
+                
+                const afterTaxIncome = totalIncome - taxAmount - totalDeductions;
                 
                 // Display results
                 resultsPlaceholder.classList.add('hidden');
                 taxResults.classList.remove('hidden');
                 
-                document.getElementById('taxableIncome').textContent = '$' + taxableIncome.toFixed(2);
-                document.getElementById('taxRate').textContent = (taxRate * 100).toFixed(0) + '%';
-                document.getElementById('taxAmount').textContent = '$' + totalTax.toFixed(2);
-                document.getElementById('afterTaxIncome').textContent = '$' + afterTaxIncome.toFixed(2);
-                document.getElementById('federalTax').textContent = '$' + taxAmount.toFixed(2);
-                document.getElementById('stateTaxResult').textContent = '$' + stateTaxAmount.toFixed(2);
-                document.getElementById('otherTaxes').textContent = '$' + otherTaxes.toFixed(2);
+                document.getElementById('taxableIncome').textContent = '₱' + taxableIncome.toFixed(2);
+                document.getElementById('taxRate').textContent = taxRate;
+                document.getElementById('taxAmount').textContent = '₱' + taxAmount.toFixed(2);
+                document.getElementById('afterTaxIncome').textContent = '₱' + afterTaxIncome.toFixed(2);
+                document.getElementById('sssResult').textContent = '₱' + sss.toFixed(2);
+                document.getElementById('philhealthResult').textContent = '₱' + philhealth.toFixed(2);
+                document.getElementById('pagibigResult').textContent = '₱' + pagibig.toFixed(2);
+                document.getElementById('otherDeductionsResult').textContent = '₱' + otherDeductions.toFixed(2);
             });
             
             // Save results button
