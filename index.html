@@ -47,6 +47,29 @@
         .format-btn:hover::after {
             transform: translateX(100%);
         }
+        
+        /* New animation for the format button */
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        }
+        
+        .formatting {
+            animation: pulse-glow 1.5s infinite;
+        }
+        
+        /* New animation for successful format */
+        @keyframes success-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .format-success {
+            animation: success-pulse 0.5s ease;
+            background-color: #10b981 !important;
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
@@ -110,7 +133,7 @@
                 </li>
                 <li class="flex items-start">
                     <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                    <span>Consistent indentation for nested clauses</span>
+                    <span>JOIN clauses on new lines with proper indentation</span>
                 </li>
                 <li class="flex items-start">
                     <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
@@ -209,23 +232,39 @@ LIMIT 10;`;
                     return;
                 }
 
-                try {
-                    const formattedSQL = formatSQL(inputSql.value);
-                    outputSql.value = formattedSQL;
-                    outputCount.textContent = `${formattedSQL.length} chars`;
-                    
-                    // Add animation effect to button
-                    formatBtn.classList.add('animate-pulse');
-                    setTimeout(() => {
-                        formatBtn.classList.remove('animate-pulse');
-                    }, 300);
-                } catch (error) {
-                    outputSql.value = `Error formatting SQL: ${error.message}`;
-                    outputCount.textContent = 'Error';
-                }
+                // Add formatting animation
+                formatBtn.classList.add('formatting');
+                formatBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Formatting...';
+                
+                // Use setTimeout to allow UI to update before heavy processing
+                setTimeout(() => {
+                    try {
+                        const formattedSQL = formatSQL(inputSql.value);
+                        outputSql.value = formattedSQL;
+                        outputCount.textContent = `${formattedSQL.length} chars`;
+                        
+                        // Success animation
+                        formatBtn.classList.remove('formatting');
+                        formatBtn.classList.add('format-success');
+                        formatBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Formatted!';
+                        
+                        setTimeout(() => {
+                            formatBtn.classList.remove('format-success');
+                            formatBtn.innerHTML = '<i class="fas fa-magic mr-2"></i> Format SQL';
+                            formatBtn.style.backgroundColor = '';
+                        }, 1000);
+                    } catch (error) {
+                        outputSql.value = `Error formatting SQL: ${error.message}`;
+                        outputCount.textContent = 'Error';
+                        
+                        // Reset button on error
+                        formatBtn.classList.remove('formatting');
+                        formatBtn.innerHTML = '<i class="fas fa-magic mr-2"></i> Format SQL';
+                    }
+                }, 50);
             });
 
-            // SQL formatting function
+            // SQL formatting function with enhanced indentation and line breaks
             function formatSQL(sql) {
                 // Basic cleanup
                 sql = sql.trim()
@@ -271,40 +310,92 @@ LIMIT 10;`;
                     });
                 }
 
-                // Indentation logic
+                // Enhanced indentation logic with custom rules for SQL keywords
                 const lines = sql.split('\n');
                 let indentLevel = 0;
                 const formattedLines = [];
+                const keywordIndentMap = {
+                    'SELECT': 0,
+                    'FROM': 0,
+                    'WHERE': 1,
+                    'GROUP BY': 1,
+                    'ORDER BY': 1,
+                    'HAVING': 1,
+                    'LIMIT': 1,
+                    'JOIN': 1,
+                    'LEFT JOIN': 1,
+                    'RIGHT JOIN': 1,
+                    'INNER JOIN': 1,
+                    'OUTER JOIN': 1,
+                    'UNION': 0,
+                    'UNION ALL': 0,
+                    'AND': 2,
+                    'OR': 2,
+                    'ON': 2,
+                    'CASE': 1,
+                    'WHEN': 2,
+                    'THEN': 2,
+                    'ELSE': 2,
+                    'END': 1
+                };
+
+                // Keywords that should start on new lines
+                const newLineKeywords = [
+                    'FROM', 'WHERE', 'GROUP BY', 'ORDER BY', 'HAVING', 'LIMIT',
+                    'JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'INNER JOIN', 'OUTER JOIN',
+                    'UNION', 'UNION ALL'
+                ];
 
                 for (let line of lines) {
                     line = line.trim();
                     if (!line) continue;
 
-                    // Decrease indent before certain clauses
-                    if (line.startsWith(')') || 
-                        line.toUpperCase().startsWith('FROM') || 
-                        line.toUpperCase().startsWith('WHERE') || 
-                        line.toUpperCase().startsWith('GROUP BY') || 
-                        line.toUpperCase().startsWith('ORDER BY') || 
-                        line.toUpperCase().startsWith('HAVING') || 
-                        line.toUpperCase().startsWith('LIMIT') ||
-                        line.toUpperCase().startsWith('UNION')) {
-                        indentLevel = Math.max(0, indentLevel - 1);
+                    // Check if line contains any new line keywords
+                    const lineUpper = line.toUpperCase();
+                    let keywordFound = null;
+                    
+                    // First check for multi-word keywords (like LEFT JOIN)
+                    for (const keyword in keywordIndentMap) {
+                        if (keyword.includes(' ') && lineUpper.startsWith(keyword.toUpperCase())) {
+                            keywordFound = keyword;
+                            break;
+                        }
+                    }
+                    
+                    // Then check single-word keywords if no multi-word found
+                    if (!keywordFound) {
+                        for (const keyword in keywordIndentMap) {
+                            if (!keyword.includes(' ') && lineUpper.startsWith(keyword.toUpperCase())) {
+                                keywordFound = keyword;
+                                break;
+                            }
+                        }
+                    }
+
+                    // If this is a keyword that should be on a new line
+                    if (keywordFound && newLineKeywords.includes(keywordFound)) {
+                        // Add a blank line before if not the first line
+                        if (formattedLines.length > 0) {
+                            formattedLines.push('');
+                        }
+                    }
+
+                    // Set indent level based on keyword if found
+                    if (keywordFound) {
+                        indentLevel = keywordIndentMap[keywordFound];
                     }
 
                     // Add current line with proper indentation
                     formattedLines.push('    '.repeat(indentLevel) + line);
 
-                    // Increase indent after certain clauses
-                    if (line.endsWith('(') || 
-                        line.toUpperCase().startsWith('SELECT') || 
-                        line.toUpperCase().startsWith('JOIN') || 
-                        line.toUpperCase().includes(' ON ') || 
-                        line.toUpperCase().startsWith('AND') || 
-                        line.toUpperCase().startsWith('OR') ||
-                        line.toUpperCase().startsWith('CASE') ||
-                        line.toUpperCase().startsWith('WHEN') ||
-                        line.toUpperCase().startsWith('ELSE')) {
+                    // Special cases that increase indent level
+                    if (lineUpper.startsWith('SELECT') && !lineUpper.includes('SELECT DISTINCT')) {
+                        indentLevel++;
+                    } else if (lineUpper.startsWith('CASE')) {
+                        indentLevel++;
+                    } else if (lineUpper.includes(' ON ') || lineUpper.startsWith('AND') || lineUpper.startsWith('OR')) {
+                        // These don't increase indent level
+                    } else if (line.endsWith('(')) {
                         indentLevel++;
                     }
                 }
