@@ -260,7 +260,7 @@
                                     step="0.01">
                             </div>
                             <div class="mt-2 text-xs text-gray-600">
-                                <span id="philhealthRange">Range: ₱500 - ₱5,000</span>
+                                <span id="philhealthRange">Range: ₱250 - ₱2,500</span>
                             </div>
                         </div>
                         
@@ -431,11 +431,11 @@
 
         function calculatePhilHealth(gross) {
             let contribution;
-            if(gross <= 10000) contribution = 500;
-            else if(gross >= 100000) contribution = 5000;
-            else contribution = gross * 0.05;
+            if(gross <= 10000) contribution = 250;
+            else if(gross >= 100000) contribution = 2500;
+            else contribution = (gross * 0.025);
             
-            document.getElementById('philhealthRange').textContent = `Range: ₱500 - ₱5,000`;
+            document.getElementById('philhealthRange').textContent = `Range: ₱250 - ₱2,500`;
             return contribution;
         }
 
@@ -456,13 +456,16 @@
             document.getElementById('pagibig').value = calculatePagIBIG(gross).toFixed(2);
         }
 
+/*         function calculateTax() {
+            let gross = parseFloat(document.getElementById('grossIncome').value) || 0;
+            const deductions = parseFloat(document.getElementById('deductions').value) || 0;
+            const nonDeductible = parseFloat(document.getElementById('nonDeductible').value) || 0; */
         function calculateTax() {
             let gross = parseFloat(document.getElementById('grossIncome').value) || 0;
             const deductions = parseFloat(document.getElementById('deductions').value) || 0;
             const nonDeductible = parseFloat(document.getElementById('nonDeductible').value) || 0;
-
             // Adjust for frequency
-            if(currentFrequency === 'semi-monthly') gross *= 2;
+            if(currentFrequency === 'semiMonthly') gross *= 2;
             else if(currentFrequency === 'weekly') gross *= 4;
 
             // Get contribution values
