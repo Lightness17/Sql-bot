@@ -62,6 +62,61 @@
             border-color: #0ea5e9;
             box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
         }
+
+        .tab-button {
+            transition: all 0.2s ease;
+        }
+
+        .tab-button.active {
+            background-color: #0ea5e9;
+            color: white;
+        }
+
+        .progress-bar {
+            height: 6px;
+            transition: width 0.5s ease;
+        }
+
+        .tax-bracket {
+            transition: all 0.2s ease;
+        }
+
+        .tax-bracket:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .tax-bracket.active {
+            border-left: 4px solid #0ea5e9;
+            background-color: #f0f9ff;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-primary-50 to-primary-100 min-h-screen">
@@ -99,6 +154,12 @@
                                     class="w-full pl-8 pr-4 py-3 border-0 bg-gray-50 rounded-lg focus:ring-2 focus:ring-primary-500 focus:bg-white"
                                     placeholder="0.00">
                             </div>
+                            <div class="flex justify-between text-xs text-gray-500 mt-2">
+                                <button onclick="setIncome(15000)" class="hover:text-primary-600">Min Wage</button>
+                                <button onclick="setIncome(30000)" class="hover:text-primary-600">Average</button>
+                                <button onclick="setIncome(50000)" class="hover:text-primary-600">Mid-Level</button>
+                                <button onclick="setIncome(80000)" class="hover:text-primary-600">Senior</button>
+                            </div>
                         </div>
                         
                         <!-- Deductions -->
@@ -124,6 +185,22 @@
                             </div>
                             <p class="text-xs text-gray-500 mt-1">(e.g. meal, transportation allowances)</p>
                         </div>
+
+                        <!-- Frequency -->
+                        <div class="input-card bg-white p-4 rounded-lg border border-gray-200">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Pay Frequency</label>
+                            <div class="flex rounded-md overflow-hidden">
+                                <button onclick="setFrequency('monthly')" id="monthlyBtn" class="tab-button flex-1 py-2 text-center bg-primary-100 text-primary-800 font-medium active">
+                                    Monthly
+                                </button>
+                                <button onclick="setFrequency('semiMonthly')" id="semiMonthlyBtn" class="tab-button flex-1 py-2 text-center bg-gray-100 text-gray-700 font-medium">
+                                    Semi-Monthly
+                                </button>
+                                <button onclick="setFrequency('weekly')" id="weeklyBtn" class="tab-button flex-1 py-2 text-center bg-gray-100 text-gray-700 font-medium">
+                                    Weekly
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
@@ -148,12 +225,19 @@
                                     <i class="fas fa-hospital text-sm"></i>
                                 </div>
                                 <h3 class="font-medium text-gray-700">SSS Contribution</h3>
+                                <div class="tooltip ml-1">
+                                    <i class="fas fa-info-circle text-primary-400 text-sm"></i>
+                                    <span class="tooltip-text text-xs">Social Security System provides benefits for retirement, disability, death, and maternity.</span>
+                                </div>
                             </div>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-500">₱</span>
                                 <input type="number" id="sss" 
                                     class="contribution-input w-full pl-8 pr-4 py-2 bg-white text-primary-700 font-bold border-b-2 border-primary-200 focus:outline-none rounded"
                                     step="0.01">
+                            </div>
+                            <div class="mt-2 text-xs text-gray-600">
+                                <span id="sssRange">Range: ₱450 - ₱1,350</span>
                             </div>
                         </div>
                         
@@ -164,12 +248,19 @@
                                     <i class="fas fa-heartbeat text-sm"></i>
                                 </div>
                                 <h3 class="font-medium text-gray-700">PhilHealth</h3>
+                                <div class="tooltip ml-1">
+                                    <i class="fas fa-info-circle text-primary-400 text-sm"></i>
+                                    <span class="tooltip-text text-xs">Philippine Health Insurance Corporation provides health insurance coverage.</span>
+                                </div>
                             </div>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-500">₱</span>
                                 <input type="number" id="philhealth" 
                                     class="contribution-input w-full pl-8 pr-4 py-2 bg-white text-primary-700 font-bold border-b-2 border-primary-200 focus:outline-none rounded"
                                     step="0.01">
+                            </div>
+                            <div class="mt-2 text-xs text-gray-600">
+                                <span id="philhealthRange">Range: ₱450 - ₱4,050</span>
                             </div>
                         </div>
                         
@@ -180,12 +271,19 @@
                                     <i class="fas fa-home text-sm"></i>
                                 </div>
                                 <h3 class="font-medium text-gray-700">Pag-IBIG</h3>
+                                <div class="tooltip ml-1">
+                                    <i class="fas fa-info-circle text-primary-400 text-sm"></i>
+                                    <span class="tooltip-text text-xs">Home Development Mutual Fund provides savings and housing loans.</span>
+                                </div>
                             </div>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-500">₱</span>
                                 <input type="number" id="pagibig" 
                                     class="contribution-input w-full pl-8 pr-4 py-2 bg-white text-primary-700 font-bold border-b-2 border-primary-200 focus:outline-none rounded"
                                     step="0.01">
+                            </div>
+                            <div class="mt-2 text-xs text-gray-600">
+                                <span id="pagibigRange">Range: ₱100 - ₱200</span>
                             </div>
                         </div>
                     </div>
@@ -233,6 +331,43 @@
                             </div>
                         </div>
                         
+                        <!-- Breakdown Section -->
+                        <div class="mt-6">
+                            <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                                <i class="fas fa-percentage text-primary-500"></i>
+                                Tax Bracket Breakdown
+                            </h3>
+                            <div id="taxBrackets" class="space-y-2">
+                                <!-- Tax brackets will be populated here -->
+                            </div>
+                        </div>
+
+                        <!-- Annual Projection -->
+                        <div class="mt-6">
+                            <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                                <i class="fas fa-calendar-alt text-primary-500"></i>
+                                Annual Projection
+                            </h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <div class="bg-white p-3 rounded-lg border border-gray-200">
+                                    <div class="text-xs text-gray-500">Annual Gross</div>
+                                    <div class="font-bold text-primary-700" id="annualGross">₱0.00</div>
+                                </div>
+                                <div class="bg-white p-3 rounded-lg border border-gray-200">
+                                    <div class="text-xs text-gray-500">Annual Tax</div>
+                                    <div class="font-bold text-red-600" id="annualTax">₱0.00</div>
+                                </div>
+                                <div class="bg-white p-3 rounded-lg border border-gray-200">
+                                    <div class="text-xs text-gray-500">Annual Net</div>
+                                    <div class="font-bold text-green-600" id="annualNet">₱0.00</div>
+                                </div>
+                                <div class="bg-white p-3 rounded-lg border border-gray-200">
+                                    <div class="text-xs text-gray-500">Effective Tax Rate</div>
+                                    <div class="font-bold text-gray-700" id="effectiveTaxRate">0%</div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm text-yellow-800">
                             <i class="fas fa-info-circle mr-2"></i>
                             These calculations are estimates based on 2024 Philippine tax brackets.
@@ -254,27 +389,65 @@
 
     <script>
         const TAX_BRACKETS = [
-            { min: 0, max: 20833, base: 0, rate: 0 },
-            { min: 20833, max: 33333, base: 0, rate: 0.20 },
-            { min: 33333, max: 66667, base: 2500, rate: 0.25 },
-            { min: 66667, max: 166667, base: 10833.33, rate: 0.30 },
-            { min: 166667, max: 666667, base: 40833.33, rate: 0.32 },
-            { min: 666667, Infinity, base: 200833.33, rate: 0.35 }
+            { min: 0, max: 20833, base: 0, rate: 0, description: "No tax for income below ₱20,833/month" },
+            { min: 20833, max: 33333, base: 0, rate: 0.20, description: "20% of excess over ₱20,833" },
+            { min: 33333, max: 66667, base: 2500, rate: 0.25, description: "₱2,500 + 25% of excess over ₱33,333" },
+            { min: 66667, max: 166667, base: 10833.33, rate: 0.30, description: "₱10,833.33 + 30% of excess over ₱66,667" },
+            { min: 166667, max: 666667, base: 40833.33, rate: 0.32, description: "₱40,833.33 + 32% of excess over ₱166,667" },
+            { min: 666667, Infinity, base: 200833.33, rate: 0.35, description: "₱200,833.33 + 35% of excess over ₱666,667" }
         ];
+
+        let currentFrequency = 'monthly';
+
+        function setIncome(amount) {
+            document.getElementById('grossIncome').value = amount;
+            resetContributions();
+        }
+
+				function setFrequency(frequency) {
+            currentFrequency = frequency;
+            
+            // Update active tab
+            document.getElementById('monthlyBtn').classList.remove('active', 'bg-primary-100', 'text-primary-800');
+            document.getElementById('semiMonthlyBtn').classList.remove('active', 'bg-primary-100', 'text-primary-800');
+            document.getElementById('weeklyBtn').classList.remove('active', 'bg-primary-100', 'text-primary-800');
+            
+            document.getElementById('monthlyBtn').classList.add('bg-gray-100', 'text-gray-700');
+            document.getElementById('semiMonthlyBtn').classList.add('bg-gray-100', 'text-gray-700');
+            document.getElementById('weeklyBtn').classList.add('bg-gray-100', 'text-gray-700');
+            
+            document.getElementById(frequency + 'Btn').classList.remove('bg-gray-100', 'text-gray-700');
+            document.getElementById(frequency + 'Btn').classList.add('active', 'bg-primary-100', 'text-primary-800');
+            
+            // Recalculate if there's already a result
+            if(!document.getElementById('results').classList.contains('hidden')) {
+                calculateTax();
+            }
+        }
+        
+        
 
         function calculateSSS(gross) {
             const salary = Math.min(gross, 30000);
-            return Math.min((salary * 0.045), 1350);
+            const contribution = Math.min((salary * 0.045), 1350);
+            document.getElementById('sssRange').textContent = `Range: ₱450 - ₱1,350`;
+            return contribution;
         }
 
         function calculatePhilHealth(gross) {
-            if(gross <= 10000) return 450;
-            if(gross >= 90000) return 4050;
-            return gross * 0.045;
+            let contribution;
+            if(gross <= 10000) contribution = 450;
+            else if(gross >= 90000) contribution = 4050;
+            else contribution = gross * 0.045;
+            
+            document.getElementById('philhealthRange').textContent = `Range: ₱450 - ₱4,050`;
+            return contribution;
         }
 
         function calculatePagIBIG(gross) {
-            return gross <= 5000 ? gross * 0.02 : Math.min(gross * 0.02, 200);
+            const contribution = gross <= 5000 ? gross * 0.02 : Math.min(gross * 0.02, 200);
+            document.getElementById('pagibigRange').textContent = `Range: ₱100 - ₱200`;
+            return contribution;
         }
 
         function formatMoney(amount) {
@@ -290,9 +463,16 @@
         }
 
         function calculateTax() {
-            const gross = parseFloat(document.getElementById('grossIncome').value) || 0;
+            let gross = parseFloat(document.getElementById('grossIncome').value) || 0;
             const deductions = parseFloat(document.getElementById('deductions').value) || 0;
             const nonDeductible = parseFloat(document.getElementById('nonDeductible').value) || 0;
+
+            // Adjust for frequency
+            if(currentFrequency === 'semi-monthly') {
+                gross *= 2;
+            } else if(currentFrequency === 'weekly') {
+                gross *= 4;
+            }
 
             // Get contribution values (including any manual edits)
             const sss = parseFloat(document.getElementById('sss').value) || 0;
@@ -315,6 +495,55 @@
             document.getElementById('taxableIncome').textContent = formatMoney(taxableIncome);
             document.getElementById('incomeTax').textContent = formatMoney(incomeTax);
             document.getElementById('netPay').textContent = formatMoney(netPay);
+
+            // Update annual projection
+            const annualGross = gross * 12;
+            const annualTax = incomeTax * 12;
+            const annualNet = netPay * 12;
+            const effectiveTaxRate = (annualTax / annualGross * 100).toFixed(2);
+            
+            document.getElementById('annualGross').textContent = formatMoney(annualGross);
+            document.getElementById('annualTax').textContent = formatMoney(annualTax);
+            document.getElementById('annualNet').textContent = formatMoney(annualNet);
+            document.getElementById('effectiveTaxRate').textContent = effectiveTaxRate + '%';
+
+            // Update tax brackets visualization
+            const taxBracketsContainer = document.getElementById('taxBrackets');
+            taxBracketsContainer.innerHTML = '';
+            
+            TAX_BRACKETS.forEach(bracket => {
+                const isActive = taxableIncome >= bracket.min && taxableIncome <= bracket.max;
+                
+                const bracketEl = document.createElement('div');
+                bracketEl.className = `tax-bracket bg-white p-3 rounded-lg border ${isActive ? 'border-primary-300 active' : 'border-gray-200'}`;
+                
+                const rangeText = bracket.max === Infinity ? 
+                    `Over ₱${bracket.min.toLocaleString('en-US', {maximumFractionDigits: 0})}` : 
+                    `₱${bracket.min.toLocaleString('en-US', {maximumFractionDigits: 0})} - ₱${bracket.max.toLocaleString('en-US', {maximumFractionDigits: 0})}`;
+                
+                const rateText = bracket.rate === 0 ? '0%' : `${(bracket.rate * 100)}%`;
+                
+                bracketEl.innerHTML = `
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-medium ${isActive ? 'text-primary-700' : 'text-gray-700'}">${rangeText}</span>
+                        <span class="text-sm ${isActive ? 'bg-primary-100 text-primary-800' : 'bg-gray-100 text-gray-700'} px-2 py-1 rounded">${rateText}</span>
+                    </div>
+                    <div class="text-xs text-gray-500">${bracket.description}</div>
+                    ${isActive ? `
+                    <div class="mt-2">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span>Your taxable income falls in this bracket</span>
+                            <span class="font-medium">${rateText} tax rate</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-1.5">
+                            <div class="bg-primary-600 h-1.5 rounded-full" style="width: ${Math.min(100, ((taxableIncome - bracket.min) / (bracket.max - bracket.min)) * 100)}%"></div>
+                        </div>
+                    </div>
+                    ` : ''}
+                `;
+                
+                taxBracketsContainer.appendChild(bracketEl);
+            });
 
             // Show results with animation
             const resultsSection = document.getElementById('results');
@@ -346,6 +575,9 @@
                 }
             });
         });
+
+        // Initialize with monthly frequency
+        setFrequency('monthly');
     </script>
 </body>
 </html>
