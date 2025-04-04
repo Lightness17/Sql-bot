@@ -3,140 +3,333 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SQL Formatter</title>
+    <title>SQL Formatter | Production-Ready SQL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f0f0f0;
+        .sql-textarea {
+            font-family: 'Courier New', Courier, monospace;
+            min-height: 200px;
+            tab-size: 4;
         }
-        .container {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
+        .copy-btn {
+            transition: all 0.2s ease;
         }
-        .editor-panel {
-            flex: 1;
-            min-width: 300px;
+        .copy-btn:hover {
+            transform: translateY(-1px);
         }
-        textarea {
+        .copy-btn:active {
+            transform: translateY(1px);
+        }
+        .format-btn {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .format-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+        }
+        .format-btn:active {
+            transform: translateY(1px);
+        }
+        .format-btn::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: 400px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 14px;
-            background-color: white;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255,255,255,0.3), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
         }
-        button {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin: 10px 0;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        h2 {
-            color: #333;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #666;
+        .format-btn:hover::after {
+            transform: translateX(100%);
         }
     </style>
 </head>
-<body>
-    <h2>SQL Formatter</h2>
-    <div class="container">
-        <div class="editor-panel">
-            <label for="input-sql">Input SQL:</label>
-            <textarea id="input-sql" placeholder="Paste your SQL code here..."></textarea>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-indigo-700 mb-2">SQL Formatter</h1>
+            <p class="text-gray-600">Format your SQL queries for production-ready code</p>
+        </header>
+
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden max-w-5xl mx-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Input SQL</h2>
+                    <div class="flex space-x-2">
+                        <button id="clear-btn" class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition">
+                            <i class="fas fa-trash-alt mr-1"></i> Clear
+                        </button>
+                        <button id="sample-btn" class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200 transition">
+                            <i class="fas fa-lightbulb mr-1"></i> Sample
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="relative">
+                    <textarea id="input-sql" class="sql-textarea w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Paste your SQL query here..."></textarea>
+                    <div class="absolute bottom-3 right-3 text-xs text-gray-500" id="input-count">0 chars</div>
+                </div>
+            </div>
+
+            <div class="flex justify-center py-2 bg-gray-50">
+                <button id="format-btn" class="format-btn px-6 py-3 bg-indigo-600 text-white font-medium rounded-full hover:bg-indigo-700 shadow-md flex items-center">
+                    <i class="fas fa-magic mr-2"></i> Format SQL
+                </button>
+            </div>
+
+            <div class="p-6 bg-gray-50">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Formatted SQL</h2>
+                    <button id="copy-btn" class="copy-btn px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">
+                        <i class="fas fa-copy mr-1"></i> Copy
+                    </button>
+                </div>
+                
+                <div class="relative">
+                    <textarea id="output-sql" readonly class="sql-textarea w-full p-4 border border-gray-300 rounded-lg bg-gray-100" placeholder="Your formatted SQL will appear here..."></textarea>
+                    <div class="absolute bottom-3 right-3 text-xs text-gray-500" id="output-count">0 chars</div>
+                </div>
+            </div>
         </div>
-        <div class="editor-panel">
-            <label for="output-sql">Formatted SQL:</label>
-            <textarea id="output-sql" readonly></textarea>
+
+        <div class="mt-8 bg-white rounded-xl shadow p-6 max-w-5xl mx-auto">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3">Formatting Rules</h3>
+            <ul class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-700">
+                <li class="flex items-start">
+                    <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                    <span>Keywords converted to uppercase (SELECT, FROM, WHERE, etc.)</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                    <span>Each column in SELECT on a new line with proper indentation</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                    <span>Consistent indentation for nested clauses</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                    <span>Alignment of JOIN conditions and WHERE clauses</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                    <span>Proper spacing around operators</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                    <span>Line breaks for better readability</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                    <span>Commas at the end of lines for columns</span>
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
+                    <span>Removal of trailing whitespace</span>
+                </li>
+            </ul>
         </div>
     </div>
-    <button onclick="formatSQL()">Format SQL</button>
 
-<script>
-    // Existing functions remain unchanged
-    function removeEmptyLines(sqlQuery) {
-        return sqlQuery
-            .split('\n')
-            .filter(line => line.trim() !== '')
-            .join('\n');
-    }
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputSql = document.getElementById('input-sql');
+            const outputSql = document.getElementById('output-sql');
+            const formatBtn = document.getElementById('format-btn');
+            const copyBtn = document.getElementById('copy-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const sampleBtn = document.getElementById('sample-btn');
+            const inputCount = document.getElementById('input-count');
+            const outputCount = document.getElementById('output-count');
 
-    function capitalizeKeywords(sqlQuery) {
-        const keywords = [
-            'SELECT', 'FROM', 'WHERE', 'JOIN', 'INNER', 'LEFT', 'RIGHT', 
-            'ON', 'GROUP BY', 'ORDER BY', 'HAVING', 'AND', 'OR', 'NOT', 
-            'IN', 'BETWEEN', 'LIKE', 'IS', 'NULL', 'DISTINCT', 'LIMIT', 
-            'OFFSET', 'WHEN'
-        ];
-        
-        let result = sqlQuery;
-        for (const keyword of keywords) {
-            const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
-            result = result.replace(regex, keyword);
-        }
-        return result;
-    }
+            // Update character count
+            inputSql.addEventListener('input', function() {
+                inputCount.textContent = `${this.value.length} chars`;
+            });
 
-    function addIndentation(sqlQuery) {
-        const indentLevels = {
-            'SELECT': 4,
-            'FROM': 6,
-            'WHERE': 5,
-            'GROUP BY': 5,
-            'ORDER BY': 5,
-            'INNER JOIN': 5,
-            'LEFT JOIN': 6,
-            'RIGHT JOIN': 5,
-            'ON': 8,
-            'AND': 7,
-            'OR': 7,
-            'HAVING': 4,
-            'LIMIT': 5,
-            'OFFSET': 5,
-            'WHEN': 16,
-            'ELSE': 16,
-            'THEN': 16
-        };
+            outputSql.addEventListener('input', function() {
+                outputCount.textContent = `${this.value.length} chars`;
+            });
 
-        const lines = sqlQuery.split('\n');
-        let indentedQuery = '';
-        let currentIndentLevel = 0;
+            // Clear button
+            clearBtn.addEventListener('click', function() {
+                inputSql.value = '';
+                outputSql.value = '';
+                inputCount.textContent = '0 chars';
+                outputCount.textContent = '0 chars';
+            });
 
-        for (const line of lines) {
-            const strippedLine = line.trim();
-            if (strippedLine) {
-                const keyword = Object.keys(indentLevels).find(kw => 
-                    strippedLine.startsWith(kw.toUpperCase())
-                );
-                currentIndentLevel = keyword ? indentLevels[keyword] : 11;
-                indentedQuery += ' '.repeat(currentIndentLevel) + strippedLine + '\n';
+            // Sample button
+            sampleBtn.addEventListener('click', function() {
+                const sampleSQL = `SELECT customers.customer_id, customers.first_name, customers.last_name, 
+COUNT(orders.order_id) AS total_orders, SUM(order_items.quantity * order_items.unit_price) AS total_spent 
+FROM customers 
+LEFT JOIN orders ON customers.customer_id = orders.customer_id 
+LEFT JOIN order_items ON orders.order_id = order_items.order_id 
+WHERE customers.status = 'active' AND orders.order_date BETWEEN '2023-01-01' AND '2023-12-31' 
+GROUP BY customers.customer_id, customers.first_name, customers.last_name 
+HAVING COUNT(orders.order_id) > 0 
+ORDER BY total_spent DESC 
+LIMIT 10;`;
+                
+                inputSql.value = sampleSQL;
+                inputCount.textContent = `${sampleSQL.length} chars`;
+            });
+
+            // Copy button
+            copyBtn.addEventListener('click', function() {
+                if (outputSql.value) {
+                    outputSql.select();
+                    document.execCommand('copy');
+                    
+                    // Visual feedback
+                    const originalText = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="fas fa-check mr-1"></i> Copied!';
+                    copyBtn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+                    copyBtn.classList.add('bg-green-500', 'hover:bg-green-600');
+                    
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalText;
+                        copyBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
+                        copyBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+                    }, 2000);
+                }
+            });
+
+            // Format button
+            formatBtn.addEventListener('click', function() {
+                if (!inputSql.value.trim()) {
+                    outputSql.value = '';
+                    outputCount.textContent = '0 chars';
+                    return;
+                }
+
+                try {
+                    const formattedSQL = formatSQL(inputSql.value);
+                    outputSql.value = formattedSQL;
+                    outputCount.textContent = `${formattedSQL.length} chars`;
+                    
+                    // Add animation effect to button
+                    formatBtn.classList.add('animate-pulse');
+                    setTimeout(() => {
+                        formatBtn.classList.remove('animate-pulse');
+                    }, 300);
+                } catch (error) {
+                    outputSql.value = `Error formatting SQL: ${error.message}`;
+                    outputCount.textContent = 'Error';
+                }
+            });
+
+            // SQL formatting function
+            function formatSQL(sql) {
+                // Basic cleanup
+                sql = sql.trim()
+                    .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+                    .replace(/\s*([(),;=<>!+\-*/%])\s*/g, ' $1 ') // Space around operators
+                    .replace(/\s*,\s*/g, ', ') // Space after commas
+                    .replace(/;\s*$/g, ';'); // Ensure semicolon at end
+
+                // Keywords to uppercase
+                const keywords = [
+                    'SELECT', 'FROM', 'WHERE', 'JOIN', 'LEFT', 'RIGHT', 'INNER', 'OUTER', 
+                    'GROUP BY', 'ORDER BY', 'HAVING', 'LIMIT', 'OFFSET', 'AS', 'ON', 
+                    'AND', 'OR', 'NOT', 'IN', 'BETWEEN', 'LIKE', 'IS NULL', 'IS NOT NULL',
+                    'INSERT INTO', 'VALUES', 'UPDATE', 'SET', 'DELETE FROM', 'CREATE TABLE',
+                    'ALTER TABLE', 'DROP TABLE', 'INDEX', 'PRIMARY KEY', 'FOREIGN KEY',
+                    'REFERENCES', 'UNIQUE', 'CHECK', 'DEFAULT', 'AUTO_INCREMENT',
+                    'DISTINCT', 'UNION', 'ALL', 'EXISTS', 'CASE', 'WHEN', 'THEN', 'ELSE', 'END',
+                    'WITH', 'RECURSIVE'
+                ];
+
+                keywords.forEach(keyword => {
+                    const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
+                    sql = sql.replace(regex, keyword);
+                });
+
+                // Special handling for SELECT columns - split to multiple lines
+                const selectRegex = /(SELECT\s+)(.*?)(\s+FROM\s+)/gi;
+                if (selectRegex.test(sql)) {
+                    sql = sql.replace(selectRegex, (match, p1, p2, p3) => {
+                        // Split columns by commas
+                        let columns = p2.split(',');
+                        // Process each column
+                        columns = columns.map(col => {
+                            // Clean up the column
+                            col = col.trim();
+                            // Add comma at end (except last column)
+                            if (col !== columns[columns.length - 1].trim()) {
+                                col += ',';
+                            }
+                            return '    ' + col;
+                        });
+                        return p1 + '\n' + columns.join('\n') + '\n' + p3;
+                    });
+                }
+
+                // Indentation logic
+                const lines = sql.split('\n');
+                let indentLevel = 0;
+                const formattedLines = [];
+
+                for (let line of lines) {
+                    line = line.trim();
+                    if (!line) continue;
+
+                    // Decrease indent before certain clauses
+                    if (line.startsWith(')') || 
+                        line.toUpperCase().startsWith('FROM') || 
+                        line.toUpperCase().startsWith('WHERE') || 
+                        line.toUpperCase().startsWith('GROUP BY') || 
+                        line.toUpperCase().startsWith('ORDER BY') || 
+                        line.toUpperCase().startsWith('HAVING') || 
+                        line.toUpperCase().startsWith('LIMIT') ||
+                        line.toUpperCase().startsWith('UNION')) {
+                        indentLevel = Math.max(0, indentLevel - 1);
+                    }
+
+                    // Add current line with proper indentation
+                    formattedLines.push('    '.repeat(indentLevel) + line);
+
+                    // Increase indent after certain clauses
+                    if (line.endsWith('(') || 
+                        line.toUpperCase().startsWith('SELECT') || 
+                        line.toUpperCase().startsWith('JOIN') || 
+                        line.toUpperCase().includes(' ON ') || 
+                        line.toUpperCase().startsWith('AND') || 
+                        line.toUpperCase().startsWith('OR') ||
+                        line.toUpperCase().startsWith('CASE') ||
+                        line.toUpperCase().startsWith('WHEN') ||
+                        line.toUpperCase().startsWith('ELSE')) {
+                        indentLevel++;
+                    }
+                }
+
+                // Join lines and clean up
+                let result = formattedLines.join('\n');
+                
+                // Ensure newlines between major clauses
+                const clauseBreaks = [
+                    'FROM', 'WHERE', 'GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 
+                    'JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'INNER JOIN', 'OUTER JOIN',
+                    'UNION', 'UNION ALL'
+                ];
+
+                clauseBreaks.forEach(clause => {
+                    const regex = new RegExp(`(\\n\\s*)(${clause})`, 'gi');
+                    result = result.replace(regex, '\n\n$1$2');
+                });
+
+                // Clean up excessive newlines
+                result = result.replace(/\n{3,}/g, '\n\n');
+
+                return result;
             }
-        }
-        return indentedQuery;
-    }
-
-    // Updated format function with processing pipeline
-    function formatSQL() {
-        const input = document.getElementById('input-sql').value;
-        const cleaned = removeEmptyLines(input);
-        const capitalized = capitalizeKeywords(cleaned);
-        const formatted = addIndentation(capitalized);
-        document.getElementById('output-sql').value = formatted;
-    }
-</script>
-
+        });
+    </script>
 </body>
 </html>
