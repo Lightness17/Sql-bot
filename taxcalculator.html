@@ -6,14 +6,36 @@
     <title>Philippine Tax Calculator 2024</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
         .animate-result {
-            animation: slideUp 0.3s ease-out;
+            animation: fadeIn 0.4s ease-out forwards;
         }
 
         input[type="number"]::-webkit-inner-spin-button,
@@ -21,92 +43,212 @@
             -webkit-appearance: none;
             margin: 0;
         }
+
+        .input-card {
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .input-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .contribution-input {
+            transition: all 0.2s ease;
+        }
+
+        .contribution-input:focus {
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
+        }
     </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gradient-to-br from-primary-50 to-primary-100 min-h-screen">
     <main class="container mx-auto px-4 py-8 max-w-4xl">
-        <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 transition-all duration-300">
-            <h1 class="text-3xl font-bold text-blue-600 mb-6 flex items-center gap-2">
-                <i class="fas fa-calculator"></i>
-                Philippine Tax Calculator 2024
-            </h1>
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300">
+            <!-- Header with gradient -->
+            <div class="bg-gradient-to-r from-primary-600 to-primary-800 p-6 text-white">
+                <div class="flex items-center gap-4">
+                    <div class="bg-white/20 p-3 rounded-full">
+                        <i class="fas fa-calculator text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold">Philippine Tax Calculator 2024</h1>
+                        <p class="text-primary-100 text-sm mt-1">Calculate your monthly take-home pay with accuracy</p>
+                    </div>
+                </div>
+            </div>
 
-            <!-- Input Section -->
-            <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div>
-                    <label class="block text-gray-700 mb-2">Monthly Gross Income (PHP)</label>
-                    <input type="number" id="grossIncome" 
-                           class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                           placeholder="Enter gross income">
-                </div>
-                <div>
-                    <label class="block text-gray-700 mb-2">Monthly Deductions (PHP)</label>
-                    <input type="number" id="deductions" 
-                           class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                           placeholder="Enter deductions">
-                </div>
-                <div>
-                    <label class="block text-gray-700 mb-2">Non-Deductible Allowances (PHP)</label>
-                    <input type="number" id="nonDeductible" 
-                           class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                           placeholder="Enter allowances">
-                </div>
-            </section>
+            <!-- Main Content -->
+            <div class="p-6 md:p-8">
+                <!-- Input Section -->
+                <section class="mb-8">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-money-bill-wave text-primary-600"></i>
+                        Income Details
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Gross Income -->
+                        <div class="input-card bg-white p-4 rounded-lg border border-gray-200">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Monthly Gross Income</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">₱</span>
+                                <input type="number" id="grossIncome" 
+                                    class="w-full pl-8 pr-4 py-3 border-0 bg-gray-50 rounded-lg focus:ring-2 focus:ring-primary-500 focus:bg-white"
+                                    placeholder="0.00">
+                            </div>
+                        </div>
+                        
+                        <!-- Deductions -->
+                        <div class="input-card bg-white p-4 rounded-lg border border-gray-200">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Monthly Deductions</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">₱</span>
+                                <input type="number" id="deductions" 
+                                    class="w-full pl-8 pr-4 py-3 border-0 bg-gray-50 rounded-lg focus:ring-2 focus:ring-primary-500 focus:bg-white"
+                                    placeholder="0.00">
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">(e.g. loans, late penalties)</p>
+                        </div>
+                        
+                        <!-- Non-Deductible -->
+                        <div class="input-card bg-white p-4 rounded-lg border border-gray-200">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Non-Taxable Allowances</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">₱</span>
+                                <input type="number" id="nonDeductible" 
+                                    class="w-full pl-8 pr-4 py-3 border-0 bg-gray-50 rounded-lg focus:ring-2 focus:ring-primary-500 focus:bg-white"
+                                    placeholder="0.00">
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">(e.g. meal, transportation allowances)</p>
+                        </div>
+                    </div>
+                </section>
 
-            <!-- Editable Contributions -->
-            <section class="mb-8">
-                <h2 class="text-xl font-semibold mb-4 text-gray-700">Mandatory Contributions (Editable)</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <h3 class="font-medium text-gray-600 mb-2">SSS Contribution</h3>
-                        <input type="number" id="sss" 
-                               class="w-full bg-transparent text-blue-600 font-bold border-b-2 border-blue-200 focus:border-blue-500 outline-none"
-                               step="0.01">
+                <!-- Contributions Section -->
+                <section class="mb-8">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800 flex items-center gap-2">
+                            <i class="fas fa-shield-alt text-primary-600"></i>
+                            Mandatory Contributions
+                        </h2>
+                        <button id="resetContributions" class="text-xs text-primary-600 hover:text-primary-800 flex items-center gap-1">
+                            <i class="fas fa-undo-alt"></i>
+                            Reset to Default
+                        </button>
                     </div>
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <h3 class="font-medium text-gray-600 mb-2">PhilHealth</h3>
-                        <input type="number" id="philhealth" 
-                               class="w-full bg-transparent text-blue-600 font-bold border-b-2 border-blue-200 focus:border-blue-500 outline-none"
-                               step="0.01">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- SSS -->
+                        <div class="bg-primary-50 p-4 rounded-lg border border-primary-100">
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="bg-primary-100 text-primary-800 p-2 rounded-full">
+                                    <i class="fas fa-hospital text-sm"></i>
+                                </div>
+                                <h3 class="font-medium text-gray-700">SSS Contribution</h3>
+                            </div>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-500">₱</span>
+                                <input type="number" id="sss" 
+                                    class="contribution-input w-full pl-8 pr-4 py-2 bg-white text-primary-700 font-bold border-b-2 border-primary-200 focus:outline-none rounded"
+                                    step="0.01">
+                            </div>
+                        </div>
+                        
+                        <!-- PhilHealth -->
+                        <div class="bg-primary-50 p-4 rounded-lg border border-primary-100">
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="bg-primary-100 text-primary-800 p-2 rounded-full">
+                                    <i class="fas fa-heartbeat text-sm"></i>
+                                </div>
+                                <h3 class="font-medium text-gray-700">PhilHealth</h3>
+                            </div>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-500">₱</span>
+                                <input type="number" id="philhealth" 
+                                    class="contribution-input w-full pl-8 pr-4 py-2 bg-white text-primary-700 font-bold border-b-2 border-primary-200 focus:outline-none rounded"
+                                    step="0.01">
+                            </div>
+                        </div>
+                        
+                        <!-- Pag-IBIG -->
+                        <div class="bg-primary-50 p-4 rounded-lg border border-primary-100">
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="bg-primary-100 text-primary-800 p-2 rounded-full">
+                                    <i class="fas fa-home text-sm"></i>
+                                </div>
+                                <h3 class="font-medium text-gray-700">Pag-IBIG</h3>
+                            </div>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-500">₱</span>
+                                <input type="number" id="pagibig" 
+                                    class="contribution-input w-full pl-8 pr-4 py-2 bg-white text-primary-700 font-bold border-b-2 border-primary-200 focus:outline-none rounded"
+                                    step="0.01">
+                            </div>
+                        </div>
                     </div>
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <h3 class="font-medium text-gray-600 mb-2">Pag-IBIG</h3>
-                        <input type="number" id="pagibig" 
-                               class="w-full bg-transparent text-blue-600 font-bold border-b-2 border-blue-200 focus:border-blue-500 outline-none"
-                               step="0.01">
-                    </div>
-                </div>
-            </section>
+                </section>
 
-            <!-- Results Section -->
-            <section class="bg-blue-50 p-6 rounded-lg animate-result hidden" id="results">
-                <h2 class="text-xl font-semibold mb-4 text-gray-700">Tax Calculation Results</h2>
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center">
-                        <span>Total Contributions:</span>
-                        <span class="font-bold" id="totalContributions">-</span>
+                <!-- Results Section -->
+                <section class="hidden" id="results">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-chart-pie text-primary-600"></i>
+                        Calculation Results
+                    </h2>
+                    
+                    <div class="bg-gradient-to-r from-primary-50 to-white p-6 rounded-xl border border-primary-100 shadow-sm">
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center pb-2 border-b border-primary-100">
+                                <div class="flex items-center gap-2 text-gray-700">
+                                    <i class="fas fa-hand-holding-usd text-primary-500"></i>
+                                    <span>Total Contributions</span>
+                                </div>
+                                <span class="font-bold text-primary-700" id="totalContributions">₱0.00</span>
+                            </div>
+                            
+                            <div class="flex justify-between items-center pb-2 border-b border-primary-100">
+                                <div class="flex items-center gap-2 text-gray-700">
+                                    <i class="fas fa-calculator text-primary-500"></i>
+                                    <span>Taxable Income</span>
+                                </div>
+                                <span class="font-bold text-primary-700" id="taxableIncome">₱0.00</span>
+                            </div>
+                            
+                            <div class="flex justify-between items-center pb-2 border-b border-primary-100">
+                                <div class="flex items-center gap-2 text-gray-700">
+                                    <i class="fas fa-file-invoice-dollar text-red-500"></i>
+                                    <span>Income Tax</span>
+                                </div>
+                                <span class="font-bold text-red-600" id="incomeTax">₱0.00</span>
+                            </div>
+                            
+                            <div class="flex justify-between items-center pt-2">
+                                <div class="flex items-center gap-2 text-gray-700">
+                                    <i class="fas fa-wallet text-green-500"></i>
+                                    <span class="font-medium">Net Monthly Pay</span>
+                                </div>
+                                <span class="text-2xl font-bold text-green-600" id="netPay">₱0.00</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm text-yellow-800">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            These calculations are estimates based on 2024 Philippine tax brackets.
+                        </div>
                     </div>
-                    <div class="flex justify-between items-center">
-                        <span>Taxable Income:</span>
-                        <span class="font-bold" id="taxableIncome">-</span>
-                    </div>
-                    <div class="flex justify-between items-center text-red-600">
-                        <span>Income Tax:</span>
-                        <span class="font-bold" id="incomeTax">-</span>
-                    </div>
-                    <div class="flex justify-between items-center text-green-600">
-                        <span>Net Monthly Pay:</span>
-                        <span class="font-bold" id="netPay">-</span>
-                    </div>
-                </div>
-            </section>
+                </section>
 
-            <button onclick="calculateTax()" 
-                    class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg mt-6
-                           hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
-                <i class="fas fa-calculator"></i>
-                Calculate Taxes
-            </button>
+                <!-- Calculate Button -->
+                <button onclick="calculateTax()" 
+                        class="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white py-4 px-6 rounded-xl mt-8
+                               hover:from-primary-700 hover:to-primary-800 transition-all shadow-md hover:shadow-lg
+                               flex items-center justify-center gap-3 font-medium">
+                    <i class="fas fa-calculator"></i>
+                    Calculate My Taxes
+                </button>
+            </div>
         </div>
     </main>
 
@@ -139,22 +281,20 @@
             return '₱' + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
         }
 
+        function resetContributions() {
+            const gross = parseFloat(document.getElementById('grossIncome').value) || 0;
+            
+            document.getElementById('sss').value = calculateSSS(gross).toFixed(2);
+            document.getElementById('philhealth').value = calculatePhilHealth(gross).toFixed(2);
+            document.getElementById('pagibig').value = calculatePagIBIG(gross).toFixed(2);
+        }
+
         function calculateTax() {
             const gross = parseFloat(document.getElementById('grossIncome').value) || 0;
             const deductions = parseFloat(document.getElementById('deductions').value) || 0;
             const nonDeductible = parseFloat(document.getElementById('nonDeductible').value) || 0;
 
-            // Calculate initial contributions
-            const sssValue = calculateSSS(gross);
-            const philhealthValue = calculatePhilHealth(gross);
-            const pagibigValue = calculatePagIBIG(gross);
-
-            // Set calculated values but preserve manual edits
-            document.getElementById('sss').value = sssValue.toFixed(2);
-            document.getElementById('philhealth').value = philhealthValue.toFixed(2);
-            document.getElementById('pagibig').value = pagibigValue.toFixed(2);
-
-            // Get final contribution values (including any manual edits)
+            // Get contribution values (including any manual edits)
             const sss = parseFloat(document.getElementById('sss').value) || 0;
             const philhealth = parseFloat(document.getElementById('philhealth').value) || 0;
             const pagibig = parseFloat(document.getElementById('pagibig').value) || 0;
@@ -176,13 +316,36 @@
             document.getElementById('incomeTax').textContent = formatMoney(incomeTax);
             document.getElementById('netPay').textContent = formatMoney(netPay);
 
-            // Show results
-            document.getElementById('results').classList.remove('hidden');
-            window.scrollTo({
-                top: document.getElementById('results').offsetTop - 100,
-                behavior: 'smooth'
-            });
+            // Show results with animation
+            const resultsSection = document.getElementById('results');
+            resultsSection.classList.remove('hidden');
+            resultsSection.classList.add('animate-result');
+            
+            // Smooth scroll to results
+            setTimeout(() => {
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
         }
+
+        // Initialize contributions when gross income changes
+        document.getElementById('grossIncome').addEventListener('input', function() {
+            resetContributions();
+        });
+
+        // Reset contributions button
+        document.getElementById('resetContributions').addEventListener('click', function(e) {
+            e.preventDefault();
+            resetContributions();
+        });
+
+        // Format inputs on blur
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('blur', function() {
+                if(this.value && !isNaN(this.value)) {
+                    this.value = parseFloat(this.value).toFixed(2);
+                }
+            });
+        });
     </script>
 </body>
 </html>
