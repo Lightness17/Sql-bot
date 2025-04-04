@@ -237,7 +237,7 @@
                                     step="0.01">
                             </div>
                             <div class="mt-2 text-xs text-gray-600">
-                                <span id="sssRange">Range: ₱450 - ₱1,350</span>
+                                <span id="sssRange">Range: ₱250 - ₱1,750</span>
                             </div>
                         </div>
                         
@@ -260,7 +260,7 @@
                                     step="0.01">
                             </div>
                             <div class="mt-2 text-xs text-gray-600">
-                                <span id="philhealthRange">Range: ₱450 - ₱4,050</span>
+                                <span id="philhealthRange">Range: ₱500 - ₱5,000</span>
                             </div>
                         </div>
                         
@@ -423,19 +423,19 @@
         }
 
         function calculateSSS(gross) {
-            const salary = Math.min(gross, 30000);
-            const contribution = Math.min((salary * 0.045), 1350);
-            document.getElementById('sssRange').textContent = `Range: ₱450 - ₱1,350`;
+            const salary = Math.min(gross, 35000);
+            const contribution = Math.min((salary * 0.05), 1750);
+            document.getElementById('sssRange').textContent = `Range: ₱250 - ₱1,750`;
             return contribution;
         }
 
         function calculatePhilHealth(gross) {
             let contribution;
-            if(gross <= 10000) contribution = 450;
-            else if(gross >= 90000) contribution = 4050;
-            else contribution = gross * 0.045;
+            if(gross <= 10000) contribution = 500;
+            else if(gross >= 100000) contribution = 5000;
+            else contribution = gross * 0.05;
             
-            document.getElementById('philhealthRange').textContent = `Range: ₱450 - ₱4,050`;
+            document.getElementById('philhealthRange').textContent = `Range: ₱500 - ₱5,000`;
             return contribution;
         }
 
