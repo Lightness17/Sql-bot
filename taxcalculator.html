@@ -289,88 +289,92 @@
                     </div>
                 </section>
 
-                <!-- Results Section -->
-                <section class="hidden" id="results">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                        <i class="fas fa-chart-pie text-primary-600"></i>
-                        Calculation Results
-                    </h2>
-                    
-                    <div class="bg-gradient-to-r from-primary-50 to-white p-6 rounded-xl border border-primary-100 shadow-sm">
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-center pb-2 border-b border-primary-100">
-                                <div class="flex items-center gap-2 text-gray-700">
-                                    <i class="fas fa-hand-holding-usd text-primary-500"></i>
-                                    <span>Total Contributions</span>
-                                </div>
-                                <span class="font-bold text-primary-700" id="totalContributions">₱0.00</span>
-                            </div>
-                            
-                            <div class="flex justify-between items-center pb-2 border-b border-primary-100">
-                                <div class="flex items-center gap-2 text-gray-700">
-                                    <i class="fas fa-calculator text-primary-500"></i>
-                                    <span>Taxable Income</span>
-                                </div>
-                                <span class="font-bold text-primary-700" id="taxableIncome">₱0.00</span>
-                            </div>
-                            
-                            <div class="flex justify-between items-center pb-2 border-b border-primary-100">
-                                <div class="flex items-center gap-2 text-gray-700">
-                                    <i class="fas fa-file-invoice-dollar text-red-500"></i>
-                                    <span>Income Tax</span>
-                                </div>
-                                <span class="font-bold text-red-600" id="incomeTax">₱0.00</span>
-                            </div>
-                            
-                            <div class="flex justify-between items-center pt-2">
-                                <div class="flex items-center gap-2 text-gray-700">
-                                    <i class="fas fa-wallet text-green-500"></i>
-                                    <span class="font-medium">Net Monthly Pay</span>
-                                </div>
-                                <span class="text-2xl font-bold text-green-600" id="netPay">₱0.00</span>
-                            </div>
-                        </div>
-                        
-                        <!-- Breakdown Section -->
-                        <div class="mt-6">
-                            <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                                <i class="fas fa-percentage text-primary-500"></i>
-                                Tax Bracket Breakdown
-                            </h3>
-                            <div id="taxBrackets" class="space-y-2">
-                                <!-- Tax brackets will be populated here -->
-                            </div>
+                <!-- New Result Form -->
+                <section id="resultForm" class="hidden mt-8 animate-result">
+                    <div class="bg-white rounded-xl shadow-lg border border-primary-100 overflow-hidden">
+                        <div class="bg-primary-50 p-4 border-b border-primary-200">
+                            <h2 class="text-xl font-semibold text-gray-800 flex items-center gap-2">
+                                <i class="fas fa-file-invoice-dollar text-primary-600"></i>
+                                Tax Calculation Result
+                            </h2>
                         </div>
 
-                        <!-- Annual Projection -->
-                        <div class="mt-6">
-                            <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                                <i class="fas fa-calendar-alt text-primary-500"></i>
-                                Annual Projection
-                            </h3>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                <div class="bg-white p-3 rounded-lg border border-gray-200">
-                                    <div class="text-xs text-gray-500">Annual Gross</div>
-                                    <div class="font-bold text-primary-700" id="annualGross">₱0.00</div>
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Tax Breakdown Card -->
+                                <div class="bg-gradient-to-br from-primary-50 to-white p-5 rounded-lg border border-primary-200">
+                                    <h3 class="text-sm font-semibold text-primary-700 mb-3">Tax Breakdown</h3>
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-sm text-gray-600">Taxable Income:</span>
+                                            <span class="font-medium text-primary-700" id="resultTaxableIncome">₱0.00</span>
+                                        </div>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-sm text-gray-600">Income Tax:</span>
+                                            <span class="font-medium text-red-600" id="resultIncomeTax">₱0.00</span>
+                                        </div>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-sm text-gray-600">Total Deductions:</span>
+                                            <span class="font-medium text-primary-700" id="resultTotalDeductions">₱0.00</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="bg-white p-3 rounded-lg border border-gray-200">
-                                    <div class="text-xs text-gray-500">Annual Tax</div>
-                                    <div class="font-bold text-red-600" id="annualTax">₱0.00</div>
-                                </div>
-                                <div class="bg-white p-3 rounded-lg border border-gray-200">
-                                    <div class="text-xs text-gray-500">Annual Net</div>
-                                    <div class="font-bold text-green-600" id="annualNet">₱0.00</div>
-                                </div>
-                                <div class="bg-white p-3 rounded-lg border border-gray-200">
-                                    <div class="text-xs text-gray-500">Effective Tax Rate</div>
-                                    <div class="font-bold text-gray-700" id="effectiveTaxRate">0%</div>
+
+                                <!-- Net Pay Highlight Card -->
+                                <div class="bg-gradient-to-br from-green-50 to-white p-5 rounded-lg border border-green-200">
+                                    <h3 class="text-sm font-semibold text-green-700 mb-3">Your Net Pay</h3>
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <span class="text-2xl font-bold text-green-700" id="resultNetPay">₱0.00</span>
+                                            <p class="text-xs text-green-600 mt-1">per month</p>
+                                        </div>
+                                        <i class="fas fa-wallet text-green-400 text-3xl"></i>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm text-yellow-800">
-                            <i class="fas fa-info-circle mr-2"></i>
-                            These calculations are estimates based on 2024 Philippine tax brackets.
+                            <!-- Detailed Breakdown -->
+                            <div class="mt-6 pt-4 border-t border-dashed border-primary-100">
+                                <h3 class="text-sm font-semibold text-gray-700 mb-4">Detailed Breakdown</h3>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-600">Gross Income:</span>
+                                        <span class="font-medium" id="resultGrossIncome">₱0.00</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-600">Non-Taxable Allowances:</span>
+                                        <span class="font-medium" id="resultNonTaxable">₱0.00</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-600">SSS Contribution:</span>
+                                        <span class="font-medium" id="resultSSS">₱0.00</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-600">PhilHealth Contribution:</span>
+                                        <span class="font-medium" id="resultPhilhealth">₱0.00</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-600">Pag-IBIG Contribution:</span>
+                                        <span class="font-medium" id="resultPagibig">₱0.00</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-600">Other Deductions:</span>
+                                        <span class="font-medium" id="resultOtherDeductions">₱0.00</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Summary Alert -->
+                            <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
+                                <div class="flex items-start gap-2">
+                                    <i class="fas fa-lightbulb mt-1 text-blue-500"></i>
+                                    <div>
+                                        <strong>Pro Tip:</strong> Your effective tax rate is 
+                                        <span class="font-medium" id="resultEffectiveRate">0%</span>. 
+                                        Consider consulting a tax professional for optimization strategies.
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -404,28 +408,19 @@
             resetContributions();
         }
 
-				function setFrequency(frequency) {
+        function setFrequency(frequency) {
             currentFrequency = frequency;
-            
-            // Update active tab
             document.getElementById('monthlyBtn').classList.remove('active', 'bg-primary-100', 'text-primary-800');
             document.getElementById('semiMonthlyBtn').classList.remove('active', 'bg-primary-100', 'text-primary-800');
             document.getElementById('weeklyBtn').classList.remove('active', 'bg-primary-100', 'text-primary-800');
             
-            document.getElementById('monthlyBtn').classList.add('bg-gray-100', 'text-gray-700');
-            document.getElementById('semiMonthlyBtn').classList.add('bg-gray-100', 'text-gray-700');
-            document.getElementById('weeklyBtn').classList.add('bg-gray-100', 'text-gray-700');
-            
             document.getElementById(frequency + 'Btn').classList.remove('bg-gray-100', 'text-gray-700');
             document.getElementById(frequency + 'Btn').classList.add('active', 'bg-primary-100', 'text-primary-800');
             
-            // Recalculate if there's already a result
-            if(!document.getElementById('results').classList.contains('hidden')) {
+            if(!document.getElementById('resultForm').classList.contains('hidden')) {
                 calculateTax();
             }
         }
-        
-        
 
         function calculateSSS(gross) {
             const salary = Math.min(gross, 30000);
@@ -456,7 +451,6 @@
 
         function resetContributions() {
             const gross = parseFloat(document.getElementById('grossIncome').value) || 0;
-            
             document.getElementById('sss').value = calculateSSS(gross).toFixed(2);
             document.getElementById('philhealth').value = calculatePhilHealth(gross).toFixed(2);
             document.getElementById('pagibig').value = calculatePagIBIG(gross).toFixed(2);
@@ -468,19 +462,16 @@
             const nonDeductible = parseFloat(document.getElementById('nonDeductible').value) || 0;
 
             // Adjust for frequency
-            if(currentFrequency === 'semi-monthly') {
-                gross *= 2;
-            } else if(currentFrequency === 'weekly') {
-                gross *= 4;
-            }
+            if(currentFrequency === 'semi-monthly') gross *= 2;
+            else if(currentFrequency === 'weekly') gross *= 4;
 
-            // Get contribution values (including any manual edits)
+            // Get contribution values
             const sss = parseFloat(document.getElementById('sss').value) || 0;
             const philhealth = parseFloat(document.getElementById('philhealth').value) || 0;
             const pagibig = parseFloat(document.getElementById('pagibig').value) || 0;
             const totalContributions = sss + philhealth + pagibig;
 
-            // Calculate taxable income with non-deductible allowances
+            // Calculate taxable income
             const taxableIncome = (gross - totalContributions - deductions) + nonDeductible;
 
             // Tax calculation
@@ -490,84 +481,43 @@
             // Net pay calculation
             const netPay = gross - totalContributions - incomeTax - deductions + nonDeductible;
 
-            // Update results
-            document.getElementById('totalContributions').textContent = formatMoney(totalContributions);
-            document.getElementById('taxableIncome').textContent = formatMoney(taxableIncome);
-            document.getElementById('incomeTax').textContent = formatMoney(incomeTax);
-            document.getElementById('netPay').textContent = formatMoney(netPay);
-
-            // Update annual projection
+            // Annual calculations
             const annualGross = gross * 12;
             const annualTax = incomeTax * 12;
             const annualNet = netPay * 12;
             const effectiveTaxRate = (annualTax / annualGross * 100).toFixed(2);
-            
-            document.getElementById('annualGross').textContent = formatMoney(annualGross);
-            document.getElementById('annualTax').textContent = formatMoney(annualTax);
-            document.getElementById('annualNet').textContent = formatMoney(annualNet);
-            document.getElementById('effectiveTaxRate').textContent = effectiveTaxRate + '%';
 
-            // Update tax brackets visualization
-            const taxBracketsContainer = document.getElementById('taxBrackets');
-            taxBracketsContainer.innerHTML = '';
-            
-            TAX_BRACKETS.forEach(bracket => {
-                const isActive = taxableIncome >= bracket.min && taxableIncome <= bracket.max;
-                
-                const bracketEl = document.createElement('div');
-                bracketEl.className = `tax-bracket bg-white p-3 rounded-lg border ${isActive ? 'border-primary-300 active' : 'border-gray-200'}`;
-                
-                const rangeText = bracket.max === Infinity ? 
-                    `Over ₱${bracket.min.toLocaleString('en-US', {maximumFractionDigits: 0})}` : 
-                    `₱${bracket.min.toLocaleString('en-US', {maximumFractionDigits: 0})} - ₱${bracket.max.toLocaleString('en-US', {maximumFractionDigits: 0})}`;
-                
-                const rateText = bracket.rate === 0 ? '0%' : `${(bracket.rate * 100)}%`;
-                
-                bracketEl.innerHTML = `
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="font-medium ${isActive ? 'text-primary-700' : 'text-gray-700'}">${rangeText}</span>
-                        <span class="text-sm ${isActive ? 'bg-primary-100 text-primary-800' : 'bg-gray-100 text-gray-700'} px-2 py-1 rounded">${rateText}</span>
-                    </div>
-                    <div class="text-xs text-gray-500">${bracket.description}</div>
-                    ${isActive ? `
-                    <div class="mt-2">
-                        <div class="flex justify-between text-xs mb-1">
-                            <span>Your taxable income falls in this bracket</span>
-                            <span class="font-medium">${rateText} tax rate</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-1.5">
-                            <div class="bg-primary-600 h-1.5 rounded-full" style="width: ${Math.min(100, ((taxableIncome - bracket.min) / (bracket.max - bracket.min)) * 100)}%"></div>
-                        </div>
-                    </div>
-                    ` : ''}
-                `;
-                
-                taxBracketsContainer.appendChild(bracketEl);
-            });
+            // Update result form
+            document.getElementById('resultGrossIncome').textContent = formatMoney(gross);
+            document.getElementById('resultTaxableIncome').textContent = formatMoney(taxableIncome);
+            document.getElementById('resultIncomeTax').textContent = formatMoney(incomeTax);
+            document.getElementById('resultTotalDeductions').textContent = formatMoney(totalContributions + deductions);
+            document.getElementById('resultNetPay').textContent = formatMoney(netPay);
+            document.getElementById('resultNonTaxable').textContent = formatMoney(nonDeductible);
+            document.getElementById('resultSSS').textContent = formatMoney(sss);
+            document.getElementById('resultPhilhealth').textContent = formatMoney(philhealth);
+            document.getElementById('resultPagibig').textContent = formatMoney(pagibig);
+            document.getElementById('resultOtherDeductions').textContent = formatMoney(deductions);
+            document.getElementById('resultEffectiveRate').textContent = effectiveTaxRate + '%';
 
-            // Show results with animation
-            const resultsSection = document.getElementById('results');
-            resultsSection.classList.remove('hidden');
-            resultsSection.classList.add('animate-result');
+            // Show results
+            const resultForm = document.getElementById('resultForm');
+            resultForm.classList.remove('hidden');
+            resultForm.classList.add('animate-result');
             
             // Smooth scroll to results
             setTimeout(() => {
-                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                resultForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }, 100);
         }
 
-        // Initialize contributions when gross income changes
-        document.getElementById('grossIncome').addEventListener('input', function() {
-            resetContributions();
-        });
-
-        // Reset contributions button
-        document.getElementById('resetContributions').addEventListener('click', function(e) {
+        // Event Listeners
+        document.getElementById('grossIncome').addEventListener('input', resetContributions);
+        document.getElementById('resetContributions').addEventListener('click', (e) => {
             e.preventDefault();
             resetContributions();
         });
 
-        // Format inputs on blur
         document.querySelectorAll('input[type="number"]').forEach(input => {
             input.addEventListener('blur', function() {
                 if(this.value && !isNaN(this.value)) {
@@ -576,7 +526,7 @@
             });
         });
 
-        // Initialize with monthly frequency
+        // Initialize
         setFrequency('monthly');
     </script>
 </body>
