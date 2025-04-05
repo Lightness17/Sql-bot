@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultra Realistic 3D Earth | Three.js</title>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            color: white;
+            background-color: #000;
+        }
+        #canvas-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        #ui-container {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 300px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        #title {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            text-shadow: 0 0 10px rgba(0, 150, 255, 0.7);
+            z-index: 100;
+        }
+        .control-group {
+            margin-bottom: 15px;
+        }
+        .control-label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #aaa;
+        }
+        .slider-container {
+            width: 100%;
+        }
+        input[type="range"] {
+            width: 100%;
+            margin-bottom: 5px;
+        }
+        .value-display {
+            font-size: 12px;
+            color: #4af;
+            text-align: right;
+        }
+        button {
+            background: rgba(0, 100, 200, 0.5);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: rgba(0, 150, 255, 0.7);
+        }
+        #info-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 250px;
+            font-size: 14px;
+            line-height: 1.5;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: none;
+        }
+        #close-info {
+            float: right;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .progress-bar {
+            width: 50%;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            margin-top: 20px;
+        }
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #0066ff, #00ccff);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        #loading-text {
+            margin-top: 10px;
+            color: #aaa;
+        }
+        #bump-intensity {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-screen">
+        <div>Loading Ultra HD Earth Model...</div>
+        <div class="progress-bar"><div class="progress" id="progress"></div></div>
+        <div id="loading-text">0%</div>
+    </div>
+
+    <div id="canvas-container"></div>
+    
+    <div id="title">ULTRA REALISTIC EARTH</div>
+    
+    <div id="info-panel">
+        <span id="close-info">×</span>
+        <h3>Earth Geological Features</h3>
+        <p>Highest Point: Mount Everest (8,848m)</p>
+        <p>Deepest Point: Mariana Trench (10,984m)</p>
+        <p>Continental Drift: 2.5 cm/year</p>
+        <p>Active Volcanoes: ~1,500</p>
+        <p>Tectonic Plates: 15 major plates</p>
+    </div>
+    
+    <div id="ui-container">
+        <div class="control-group">
+            <div class="control-label">Rotation Speed</div>
+            <div class="slider-container">
+                <input type="range" id="rotation-speed" min="0" max="2" step="0.1" value="1">
+                <div class="value-display" id="rotation-speed-value">1.0x</div>
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <div class="control-label">Bump Intensity</div>
+            <div class="slider-container">
+                <input type="range" id="bump-intensity" min="0" max="0.2" step="0.01" value="0.08">
+                <div class="value-display" id="bump-intensity-value">0.08</div>
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <div class="control-label">Cloud Opacity</div>
+            <div class="slider-container">
+                <input type="range" id="cloud-opacity" min="0" max="1" step="0.1" value="0.8">
+                <div class="value-display" id="cloud-opacity-value">0.8</div>
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <div class="control-label">Atmosphere Intensity</div>
+            <div class="slider-container">
+                <input type="range" id="atmosphere-intensity" min="0" max="2" step="0.1" value="1">
+                <div class="value-display" id="atmosphere-intensity-value">1.0</div>
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <div class="control-label">Specular Intensity</div>
+            <div class="slider-container">
+                <input type="range" id="specular-intensity" min="0" max="1" step="0.1" value="0.5">
+                <div class="value-display" id="specular-intensity-value">0.5</div>
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <button id="toggle-atmosphere">Atmosphere: ON</button>
+            <button id="toggle-clouds">Clouds: ON</button>
+            <button id="toggle-bump">Bump Mapping: ON</button>
+            <button id="toggle-night-lights">Night Lights: ON</button>
+        </div>
+        
+        <div class="control-group">
+            <button id="reset-view">Reset View</button>
+            <button id="auto-rotate">Auto-Rotate: ON</button>
+            <button id="info-button">Geological Info</button>
+        </div>
+    </div>
+
+    <script>
+        // Main Three.js application
+        document.addEventListener('DOMContentLoaded', () => {
+            // Scene setup
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000000);
+            
+            // Camera setup
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.01, 1000);
+            camera.position.z = 5;
+            
+            // Renderer setup
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+            
+            // Enable physically correct lighting
+            renderer.physicallyCorrectLights = true;
+            
+            // Orbit controls with enhanced zoom
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.minDistance = 1.5;
+            controls.maxDistance = 20;
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 0.5;
+            controls.zoomSpeed = 2.0;
+            controls.panSpeed = 0.5;
+            
+            // Advanced lighting
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+            directionalLight.position.set(5, 3, 5);
+            scene.add(directionalLight);
+            
+            const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.3);
+            scene.add(hemisphereLight);
+            
+            // Stars background
+            function createStars(density) {
+                const starsGeometry = new THREE.BufferGeometry();
+                const starsMaterial = new THREE.PointsMaterial({
+                    color: 0xffffff,
+                    size: 0.05,
+                    transparent: true,
+                    sizeAttenuation: true
+                });
+                
+                const starsVertices = [];
+                for (let i = 0; i < density; i++) {
+                    const x = (Math.random() - 0.5) * 2000;
+                    const y = (Math.random() - 0.5) * 2000;
+                    const z = (Math.random() - 0.5) * 2000;
+                    starsVertices.push(x, y, z);
+                    
+                    if (Math.random() > 0.9) {
+                        starsMaterial.color.setHSL(Math.random(), 0.5, 0.7);
+                    }
+                }
+                
+                starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsVertices, 3));
+                const stars = new THREE.Points(starsGeometry, starsMaterial);
+                scene.add(stars);
+                return stars;
+            }
+            
+            let stars = createStars(2000);
+            
+            // Earth group
+            const earthGroup = new THREE.Group();
+            scene.add(earthGroup);
+            
+            // Textures
+            const textureLoader = new THREE.TextureLoader();
+            let earthMesh, cloudsMesh, atmosphereMesh;
+            let earthMaterial, cloudsMaterial, atmosphereMaterial;
+            
+            // Track loaded textures
+            let loadedTextures = 0;
+            const totalTextures = 5;
+            
+            function updateProgress() {
+                loadedTextures++;
+                const progress = Math.round((loadedTextures / totalTextures) * 100);
+                document.getElementById('progress').style.width = `${progress}%`;
+                document.getElementById('loading-text').textContent = `${progress}%`;
+                
+                if (loadedTextures === totalTextures) {
+                    setTimeout(() => {
+                        document.getElementById('loading-screen').style.opacity = 0;
+                        setTimeout(() => {
+                            document.getElementById('loading-screen').style.display = 'none';
+                        }, 500);
+                    }, 500);
+                }
+            }
+            
+            // Earth geometry
+            const earthGeometry = new THREE.SphereGeometry(1, 128, 128);
+            
+            // Function to load texture with error handling
+            function loadTexture(url, onLoad, onProgress, onError) {
+                return textureLoader.load(
+                    url,
+                    (texture) => {
+                        texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+                        onLoad(texture);
+                    },
+                    onProgress,
+                    (error) => {
+                        console.error('Error loading texture:', url, error);
+                        onError();
+                    }
+                );
+            }
+            
+            // Load earth textures
+            loadTexture(
+                'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg',
+                (texture) => {
+                    earthMaterial = new THREE.MeshPhongMaterial({
+                        map: texture,
+                        specular: new THREE.Color(0x111111),
+                        shininess: 10,
+                        bumpScale: 0.08
+                    });
+                    
+                    loadTexture(
+                        'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_normal_2048.jpg',
+                        (normalMap) => {
+                            earthMaterial.normalMap = normalMap;
+                            updateProgress();
+                            
+                            loadTexture(
+                                'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_specular_2048.jpg',
+                                (specularMap) => {
+                                    earthMaterial.specularMap = specularMap;
+                                    updateProgress();
+                                    
+                                    loadTexture(
+                                        'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_normal_2048.jpg',
+                                        (bumpMap) => {
+                                            earthMaterial.bumpMap = bumpMap;
+                                            updateProgress();
+                                            
+                                            earthMesh = new THREE.Mesh(earthGeometry, earthMaterial);
+                                            earthGroup.add(earthMesh);
+                                            
+                                            loadTexture(
+                                                'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_lights_2048.png',
+                                                (lightsMap) => {
+                                                    earthMaterial.emissiveMap = lightsMap;
+                                                    earthMaterial.emissive = new THREE.Color(0xffffff);
+                                                    earthMaterial.emissiveIntensity = 0.1;
+                                                    updateProgress();
+                                                },
+                                                undefined,
+                                                () => {
+                                                    earthMaterial.emissive = new THREE.Color(0x000000);
+                                                    updateProgress();
+                                                }
+                                            );
+                                        },
+                                        undefined,
+                                        () => {
+                                            earthMaterial.bumpScale = 0;
+                                            updateProgress();
+                                        }
+                                    );
+                                },
+                                undefined,
+                                () => {
+                                    updateProgress();
+                                }
+                            );
+                        },
+                        undefined,
+                        () => {
+                            updateProgress();
+                        }
+                    );
+                },
+                undefined,
+                () => {
+                    earthMaterial = new THREE.MeshPhongMaterial({ color: 0x2233ff });
+                    updateProgress();
+                }
+            );
+            
+            // Clouds
+            const cloudsGeometry = new THREE.SphereGeometry(1.005, 128, 128);
+            loadTexture(
+                'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_clouds_1024.png',
+                (cloudsTexture) => {
+                    cloudsTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+                    cloudsMaterial = new THREE.MeshPhongMaterial({
+                        map: cloudsTexture,
+                        transparent: true,
+                        opacity: 0.8,
+                        depthWrite: false,
+                        specular: new THREE.Color(0x111111),
+                        shininess: 2
+                    });
+                    cloudsMesh = new THREE.Mesh(cloudsGeometry, cloudsMaterial);
+                    earthGroup.add(cloudsMesh);
+                    updateProgress();
+                },
+                undefined,
+                () => {
+                    updateProgress();
+                }
+            );
+            
+            // Atmosphere shader (fixed syntax error here)
+            const atmosphereGeometry = new THREE.SphereGeometry(1.1, 128, 128);
+            atmosphereMaterial = new THREE.ShaderMaterial({
+                uniforms: {
+                    glowColor: { type: "c", value: new THREE.Color(0x00a3ff) },
+                    viewVector: { type: "v3", value: camera.position },
+                    intensity: { type: "f", value: 1.0 }
+                },
+                vertexShader: `
+                    uniform vec3 viewVector;
+                    varying float intensity;
+                    void main() {
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                        vec3 actual_normal = normalize(normalMatrix * normal);
+                        intensity = pow(1.2 - max(dot(actual_normal, normalize(viewVector)), 0.0), 3.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform vec3 glowColor;
+                    uniform float intensity;
+                    varying float intensityV;
+                    void main() {
+                        vec3 glow = glowColor * intensity * intensityV;
+                        gl_FragColor = vec4(glow, intensityV * 0.4);
+                    }
+                `,
+                side: THREE.BackSide,
+                blending: THREE.AdditiveBlending,
+                transparent: true
+            });
+            atmosphereMesh = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+            earthGroup.add(atmosphereMesh);
+            
+            // UI Controls
+            const rotationSpeedSlider = document.getElementById('rotation-speed');
+            const rotationSpeedValue = document.getElementById('rotation-speed-value');
+            const bumpIntensitySlider = document.getElementById('bump-intensity');
+            const bumpIntensityValue = document.getElementById('bump-intensity-value');
+            const cloudOpacitySlider = document.getElementById('cloud-opacity');
+            const cloudOpacityValue = document.getElementById('cloud-opacity-value');
+            const atmosphereIntensitySlider = document.getElementById('atmosphere-intensity');
+            const atmosphereIntensityValue = document.getElementById('atmosphere-intensity-value');
+            const specularIntensitySlider = document.getElementById('specular-intensity');
+            const specularIntensityValue = document.getElementById('specular-intensity-value');
+            const toggleAtmosphereBtn = document.getElementById('toggle-atmosphere');
+            const toggleCloudsBtn = document.getElementById('toggle-clouds');
+            const toggleBumpBtn = document.getElementById('toggle-bump');
+            const toggleNightLightsBtn = document.getElementById('toggle-night-lights');
+            const resetViewBtn = document.getElementById('reset-view');
+            const autoRotateBtn = document.getElementById('auto-rotate');
+            const infoButton = document.getElementById('info-button');
+            const infoPanel = document.getElementById('info-panel');
+            const closeInfo = document.getElementById('close-info');
+            
+            let atmosphereVisible = true;
+            let cloudsVisible = true;
+            let nightLightsVisible = true;
+            let bumpMappingVisible = true;
+            let autoRotate = true;
+            
+            // Event listeners
+            rotationSpeedSlider.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                rotationSpeedValue.textContent = value.toFixed(1) + 'x';
+                controls.autoRotateSpeed = value * 0.5;
+            });
+            
+            bumpIntensitySlider.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                bumpIntensityValue.textContent = value.toFixed(2);
+                if (earthMaterial) earthMaterial.bumpScale = value;
+            });
+            
+            cloudOpacitySlider.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                cloudOpacityValue.textContent = value.toFixed(1);
+                if (cloudsMaterial) cloudsMaterial.opacity = value;
+            });
+            
+            atmosphereIntensitySlider.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                atmosphereIntensityValue.textContent = value.toFixed(1);
+                if (atmosphereMaterial) {
+                    atmosphereMaterial.uniforms.intensity.value = value;
+                    atmosphereMaterial.uniforms.glowColor.value.setHSL(0.6, 0.8, value * 0.3);
+                }
+            });
+            
+            specularIntensitySlider.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                specularIntensityValue.textContent = value.toFixed(1);
+                if (earthMaterial) {
+                    earthMaterial.shininess = value * 20;
+                    earthMaterial.specular.setHSL(0.1, 0.1, value * 0.2);
+                }
+            });
+            
+            toggleAtmosphereBtn.addEventListener('click', () => {
+                atmosphereVisible = !atmosphereVisible;
+                atmosphereMesh.visible = atmosphereVisible;
+                toggleAtmosphereBtn.textContent = `Atmosphere: ${atmosphereVisible ? 'ON' : 'OFF'}`;
+            });
+            
+            toggleCloudsBtn.addEventListener('click', () => {
+                cloudsVisible = !cloudsVisible;
+                cloudsMesh.visible = cloudsVisible;
+                toggleCloudsBtn.textContent = `Clouds: ${cloudsVisible ? 'ON' : 'OFF'}`;
+            });
+            
+            toggleBumpBtn.addEventListener('click', () => {
+                bumpMappingVisible = !bumpMappingVisible;
+                if (earthMaterial) {
+                    earthMaterial.bumpScale = bumpMappingVisible ? parseFloat(bumpIntensitySlider.value) : 0;
+                }
+                toggleBumpBtn.textContent = `Bump Mapping: ${bumpMappingVisible ? 'ON' : 'OFF'}`;
+            });
+            
+            toggleNightLightsBtn.addEventListener('click', () => {
+                nightLightsVisible = !nightLightsVisible;
+                if (earthMaterial) {
+                    earthMaterial.emissiveIntensity = nightLightsVisible ? 0.1 : 0;
+                }
+                toggleNightLightsBtn.textContent = `Night Lights: ${nightLightsVisible ? 'ON' : 'OFF'}`;
+            });
+            
+            resetViewBtn.addEventListener('click', () => {
+                controls.reset();
+                camera.position.z = 5;
+            });
+            
+            autoRotateBtn.addEventListener('click', () => {
+                autoRotate = !autoRotate;
+                controls.autoRotate = autoRotate;
+                autoRotateBtn.textContent = `Auto-Rotate: ${autoRotate ? 'ON' : 'OFF'}`;
+            });
+            
+            infoButton.addEventListener('click', () => {
+                infoPanel.style.display = infoPanel.style.display === 'block' ? 'none' : 'block';
+            });
+            
+            closeInfo.addEventListener('click', () => {
+                infoPanel.style.display = 'none';
+            });
+            
+            // Window resize handler
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+            
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                if (earthMesh) earthMesh.rotation.y += 0.001 * parseFloat(rotationSpeedSlider.value);
+                if (cloudsMesh) cloudsMesh.rotation.y += 0.0012 * parseFloat(rotationSpeedSlider.value);
+                
+                if (atmosphereMaterial) {
+                    atmosphereMaterial.uniforms.viewVector.value = 
+                        new THREE.Vector3().subVectors(camera.position, atmosphereMesh.position);
+                }
+                
+                controls.update();
+                renderer.render(scene, camera);
+            }
+            
+            animate();
+        });
+    </script>
+</body>
+</html>
